@@ -1,0 +1,72 @@
+[
+  {
+    "id": "lpdp-001",
+
+    "name": "LPDP Scholarship",
+
+    "provider": "Indonesian Government",
+
+    "country": "Indonesia",
+
+    "study_level": [
+      "Master",
+      "PhD"
+    ],
+
+    "field_of_study": [
+      "Engineering",
+      "Technology",
+      "Social Science",
+      "Business"
+    ],
+
+    "requirements": {
+      "ielts": "6.5+",
+      "leadership": true,
+      "community_service": true
+    },
+
+    "ideal_candidate": [
+      "Indonesian citizens",
+      "Students with leadership potential",
+      "Applicants with community impact"
+    ],
+
+    "description":
+    "Government scholarship supporting Indonesian students pursuing postgraduate study."
+  },
+
+
+  {
+    "id": "chevening-001",
+
+    "name": "Chevening Scholarship",
+
+    "provider": "UK Government",
+
+    "country": "United Kingdom",
+
+    "study_level": [
+      "Master"
+    ],
+
+    "field_of_study": [
+      "All fields"
+    ],
+
+    "requirements": {
+      "ielts": "Depends on university requirement",
+      "leadership": true,
+      "work_experience": true
+    },
+
+    "ideal_candidate": [
+      "Future leaders",
+      "Applicants with professional experience",
+      "People with networking potential"
+    ],
+
+    "description":
+    "UK government scholarship for future global leaders."
+  }
+]
