@@ -1,72 +1,592 @@
 [
   {
     "id": "lpdp-001",
-
     "name": "LPDP Scholarship",
-
     "provider": "Indonesian Government",
-
     "country": "Indonesia",
 
-    "study_level": [
+    "study_levels": [
       "Master",
       "PhD"
     ],
 
-    "field_of_study": [
-      "Engineering",
-      "Technology",
-      "Social Science",
-      "Business"
+    "fields_of_study": [
+      "All fields (subject to LPDP priority programs)"
     ],
 
     "requirements": {
-      "ielts": "6.5+",
-      "leadership": true,
-      "community_service": true
+      "nationality": "Indonesian citizen",
+      "minimum_ielts": 6.5,
+      "accepted_english_tests": [
+        "IELTS",
+        "TOEFL"
+      ],
+      "minimum_work_experience_years": 0,
+      "minimum_gpa": null,
+      "leadership_required": true,
+      "community_service_required": true
     },
 
-    "ideal_candidate": [
+    "ideal_candidates": [
       "Indonesian citizens",
-      "Students with leadership potential",
-      "Applicants with community impact"
+      "Future leaders",
+      "Applicants with social impact"
     ],
 
-    "description":
-    "Government scholarship supporting Indonesian students pursuing postgraduate study."
+    "benefits": [
+      "Full tuition",
+      "Living allowance",
+      "Research funding"
+    ],
+
+    "keywords": [
+      "government",
+      "Indonesia",
+      "leadership",
+      "fully funded",
+      "postgraduate"
+    ],
+
+    "profile_tags": [
+      "leadership",
+      "community service",
+      "social impact"
+    ],
+
+    "deadline": {
+      "application_period": "30 June - 31 July 2026"
+    },
+
+    "description": "Government-funded scholarship supporting Indonesians pursuing postgraduate studies at top universities.",
+
+    "official_url": "https://lpdp.kemenkeu.go.id"
   },
 
+  {
+    "id": "daad-001",
+    "name": "DAAD EPOS Scholarship",
+    "provider": "DAAD",
+    "country": "Germany",
+
+    "study_levels": [
+      "Master",
+      "PhD"
+    ],
+
+    "fields_of_study": [
+      "Development Studies",
+      "Engineering",
+      "Economics",
+      "Public Policy",
+      "Environmental Sciences"
+    ],
+
+    "requirements": {
+      "nationality": "International students",
+      "minimum_ielts": null,
+      "accepted_english_tests": [],
+      "minimum_work_experience_years": 2,
+      "minimum_gpa": null,
+      "leadership_required": false,
+      "community_service_required": false
+    },
+
+    "ideal_candidates": [
+      "Professionals from developing countries",
+      "Applicants with relevant work experience"
+    ],
+
+    "benefits": [],
+
+    "keywords": [
+      "Germany",
+      "development",
+      "engineering",
+      "government",
+      "EPOS"
+    ],
+
+    "profile_tags": [
+      "professional experience",
+      "development",
+      "career advancement"
+    ],
+
+    "deadline": {
+      "application_period": "Varies by university (typically August-October annually)"
+    },
+
+    "description": "German government scholarship for development-related postgraduate programs.",
+
+    "official_url": "https://www.daad.de"
+  },
 
   {
-    "id": "chevening-001",
+    "id": "aas-001",
+    "name": "Australia Awards Scholarship",
+    "provider": "Australian Government",
+    "country": "Australia",
 
-    "name": "Chevening Scholarship",
-
-    "provider": "UK Government",
-
-    "country": "United Kingdom",
-
-    "study_level": [
+    "study_levels": [
       "Master"
     ],
 
-    "field_of_study": [
+    "fields_of_study": [
+      "Priority development fields"
+    ],
+
+    "requirements": {
+      "nationality": "Eligible developing countries",
+      "minimum_ielts": null,
+      "accepted_english_tests": [],
+      "minimum_work_experience_years": null,
+      "minimum_gpa": null,
+      "leadership_required": true,
+      "community_service_required": false
+    },
+
+    "ideal_candidates": [
+      "Future leaders",
+      "Public sector professionals",
+      "Development practitioners"
+    ],
+
+    "benefits": [],
+
+    "keywords": [
+      "Australia",
+      "government",
+      "development",
+      "leadership",
+      "international"
+    ],
+
+    "profile_tags": [
+      "leadership",
+      "public service",
+      "development"
+    ],
+
+    "deadline": {
+      "application_period": "Usually February-April"
+    },
+
+    "description": "Australia's flagship international development scholarship.",
+
+    "official_url": "https://www.australiaawardsindonesia.org"
+  },
+
+  {
+    "id": "chevening-001",
+    "name": "Chevening Scholarship",
+    "provider": "UK Government",
+    "country": "United Kingdom",
+
+    "study_levels": [
+      "Master"
+    ],
+
+    "fields_of_study": [
       "All fields"
     ],
 
     "requirements": {
-      "ielts": "Depends on university requirement",
-      "leadership": true,
-      "work_experience": true
+      "nationality": "Chevening-eligible country",
+      "minimum_ielts": null,
+      "accepted_english_tests": [],
+      "minimum_work_experience_years": 2,
+      "minimum_gpa": null,
+      "leadership_required": true,
+      "community_service_required": false
     },
 
-    "ideal_candidate": [
+    "ideal_candidates": [
       "Future leaders",
-      "Applicants with professional experience",
-      "People with networking potential"
+      "Professionals",
+      "Applicants with networking potential"
     ],
 
-    "description":
-    "UK government scholarship for future global leaders."
+    "benefits": [],
+
+    "keywords": [
+      "United Kingdom",
+      "government",
+      "leadership",
+      "networking",
+      "global leaders"
+    ],
+
+    "profile_tags": [
+      "leadership",
+      "professional experience",
+      "networking"
+    ],
+
+    "deadline": {
+      "application_period": "4 August - 6 October 2026"
+    },
+
+    "description": "UK Government scholarship for future global leaders.",
+
+    "official_url": "https://www.chevening.org"
+  },
+
+  {
+    "id": "fulbright-001",
+    "name": "Fulbright Scholarship",
+    "provider": "U.S. Government",
+    "country": "United States",
+
+    "study_levels": [
+      "Master",
+      "PhD"
+    ],
+
+    "fields_of_study": [
+      "All fields except clinical medicine"
+    ],
+
+    "requirements": {
+      "nationality": "Depends on country",
+      "minimum_ielts": null,
+      "accepted_english_tests": [
+        "IELTS",
+        "TOEFL"
+      ],
+      "minimum_work_experience_years": 0,
+      "minimum_gpa": null,
+      "leadership_required": true,
+      "community_service_required": false
+    },
+
+    "ideal_candidates": [
+      "Academic achievers",
+      "Future leaders",
+      "Researchers"
+    ],
+
+    "benefits": [],
+
+    "keywords": [
+      "United States",
+      "government",
+      "research",
+      "academic",
+      "exchange"
+    ],
+
+    "profile_tags": [
+      "research",
+      "academic excellence",
+      "leadership"
+    ],
+
+    "deadline": {
+      "application_period": "Usually February-May (country dependent)"
+    },
+
+    "description": "Prestigious U.S. government scholarship promoting educational exchange.",
+
+    "official_url": "https://foreign.fulbrightonline.org"
+  },
+  {
+    "id": "turkiye-001",
+    "name": "Türkiye Scholarships",
+    "provider": "Government of Türkiye",
+    "country": "Türkiye",
+
+    "study_levels": [
+      "Bachelor",
+      "Master",
+      "PhD"
+    ],
+
+    "fields_of_study": [
+      "Most fields"
+    ],
+
+    "requirements": {
+      "nationality": "International students",
+      "minimum_ielts": null,
+      "accepted_english_tests": [],
+      "minimum_work_experience_years": 0,
+      "minimum_gpa": null,
+      "leadership_required": true,
+      "community_service_required": false
+    },
+
+    "ideal_candidates": [
+      "Outstanding international students",
+      "Academically excellent applicants"
+    ],
+
+    "benefits": [
+      "Full tuition",
+      "Accommodation",
+      "Monthly stipend",
+      "Airfare"
+    ],
+
+    "keywords": [
+      "Türkiye",
+      "government",
+      "fully funded",
+      "international",
+      "scholarship"
+    ],
+
+    "profile_tags": [
+      "academic excellence",
+      "leadership",
+      "global perspective"
+    ],
+
+    "deadline": {
+      "application_period": "10 January - 20 February"
+    },
+
+    "description": "Fully funded Turkish government scholarship including tuition, accommodation, stipend and airfare.",
+
+    "official_url": "https://turkiyeburslari.gov.tr"
+  },
+
+  {
+    "id": "uae-001",
+    "name": "UAE Government Scholarship",
+    "provider": "Various UAE Universities & Government",
+    "country": "United Arab Emirates",
+
+    "study_levels": [
+      "Bachelor",
+      "Master",
+      "PhD"
+    ],
+
+    "fields_of_study": [
+      "Engineering",
+      "Science",
+      "Business",
+      "Artificial Intelligence",
+      "Medicine"
+    ],
+
+    "requirements": {
+      "nationality": "International students",
+      "minimum_ielts": 6.0,
+      "accepted_english_tests": [
+        "IELTS"
+      ],
+      "minimum_work_experience_years": 0,
+      "minimum_gpa": null,
+      "leadership_required": false,
+      "community_service_required": false
+    },
+
+    "ideal_candidates": [
+      "High-achieving students",
+      "Research-oriented applicants"
+    ],
+
+    "benefits": [],
+
+    "keywords": [
+      "UAE",
+      "AI",
+      "engineering",
+      "research",
+      "innovation"
+    ],
+
+    "profile_tags": [
+      "academic excellence",
+      "research",
+      "innovation"
+    ],
+
+    "deadline": {
+      "application_period": "Varies by university"
+    },
+
+    "description": "Scholarships offered by UAE government and leading universities such as MBZUAI, Khalifa University and UAE University.",
+
+    "official_url": "https://www.moe.gov.ae"
+  },
+
+  {
+    "id": "usa-001",
+    "name": "U.S. University Scholarships",
+    "provider": "Individual Universities",
+    "country": "United States",
+
+    "study_levels": [
+      "Bachelor",
+      "Master",
+      "PhD"
+    ],
+
+    "fields_of_study": [
+      "All fields"
+    ],
+
+    "requirements": {
+      "nationality": "Varies by university",
+      "minimum_ielts": null,
+      "accepted_english_tests": [],
+      "minimum_work_experience_years": 0,
+      "minimum_gpa": null,
+      "leadership_required": false,
+      "community_service_required": false
+    },
+
+    "ideal_candidates": [
+      "Outstanding students",
+      "High GPA applicants"
+    ],
+
+    "benefits": [],
+
+    "keywords": [
+      "United States",
+      "university",
+      "merit",
+      "academic excellence"
+    ],
+
+    "profile_tags": [
+      "academic excellence",
+      "high GPA"
+    ],
+
+    "deadline": {
+      "application_period": "Varies by university"
+    },
+
+    "description": "Merit-based scholarships offered by U.S. universities.",
+
+    "official_url": "https://educationusa.state.gov"
+  },
+
+  {
+    "id": "mext-001",
+    "name": "MEXT Scholarship",
+    "provider": "Government of Japan",
+    "country": "Japan",
+
+    "study_levels": [
+      "Bachelor",
+      "Master",
+      "PhD"
+    ],
+
+    "fields_of_study": [
+      "All fields"
+    ],
+
+    "requirements": {
+      "nationality": "International students",
+      "minimum_ielts": null,
+      "accepted_english_tests": [],
+      "minimum_work_experience_years": 0,
+      "minimum_gpa": null,
+      "leadership_required": false,
+      "community_service_required": false
+    },
+
+    "ideal_candidates": [
+      "Excellent academic record",
+      "Research-oriented applicants"
+    ],
+
+    "benefits": [
+      "Full tuition",
+      "Monthly allowance",
+      "Airfare"
+    ],
+
+    "keywords": [
+      "Japan",
+      "government",
+      "research",
+      "fully funded",
+      "academic"
+    ],
+
+    "profile_tags": [
+      "research",
+      "academic excellence",
+      "innovation"
+    ],
+
+    "deadline": {
+      "application_period": "Usually April-May (Embassy recommendation)"
+    },
+
+    "description": "Japanese government scholarship covering tuition, living allowance and airfare.",
+
+    "official_url": "https://www.studyinjapan.go.jp"
+  },
+
+  {
+    "id": "gks-001",
+    "name": "Global Korea Scholarship",
+    "provider": "Korean Government",
+    "country": "South Korea",
+
+    "study_levels": [
+      "Bachelor",
+      "Master",
+      "PhD"
+    ],
+
+    "fields_of_study": [
+      "Most fields"
+    ],
+
+    "requirements": {
+      "nationality": "International students",
+      "minimum_ielts": null,
+      "accepted_english_tests": [
+        "IELTS",
+        "TOEFL",
+        "TOPIK"
+      ],
+      "minimum_work_experience_years": 0,
+      "minimum_gpa": null,
+      "leadership_required": false,
+      "community_service_required": false
+    },
+
+    "ideal_candidates": [
+      "Outstanding students",
+      "Research-minded applicants"
+    ],
+
+    "benefits": [
+      "Full tuition",
+      "Monthly stipend",
+      "Airfare"
+    ],
+
+    "keywords": [
+      "South Korea",
+      "government",
+      "fully funded",
+      "research",
+      "international"
+    ],
+
+    "profile_tags": [
+      "research",
+      "academic excellence",
+      "global mindset"
+    ],
+
+    "deadline": {
+      "application_period": "Usually February-March (Embassy track)"
+    },
+
+    "description": "Fully funded Korean Government scholarship including tuition, stipend and airfare.",
+
+    "official_url": "https://www.studyinkorea.go.kr"
   }
 ]
