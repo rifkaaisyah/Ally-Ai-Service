@@ -26,11 +26,21 @@ const {
     filterScholarships
 } = require("./filterService");
 
+const {
+    adaptAssessmentProfile
+} = require("./profileAdapter");
 
+const {
+    generateRoadmap
+} = require("../services/roadmapService");
 
 async function getScholarshipRecommendation(
     studentProfile
 ) {
+     studentProfile =
+        adaptAssessmentProfile(
+            studentProfile
+        );
 
     // 1. Build a natural language query from the student's profile
 
@@ -96,12 +106,17 @@ const rankedScholarships =
 const topScholarships =
     rankedScholarships.slice(0,3);
     // 7. Build the prompt
-
-    const prompt =
-        buildScholarshipPrompt(
-    userQuery,
-    topScholarships
-);
+    const roadmap =
+    generateRoadmap(
+        studentProfile,
+        topScholarships
+    );
+ const prompt =
+    buildScholarshipPrompt(
+        userQuery,
+        topScholarships,
+        roadmap
+    );
 
 
     // 8. Generate the AI response
@@ -112,7 +127,20 @@ const topScholarships =
         );
 
 
-    return answer;
+    return {
+
+    recommendedScholarships:
+        topScholarships,
+
+    roadmap:
+
+        roadmap,
+
+    aiRecommendation:
+
+        answer
+
+};
 
 }
 

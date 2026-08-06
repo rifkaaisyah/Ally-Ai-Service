@@ -1,0 +1,25 @@
+{
+    "guest_token": "local-test-token-001",
+    "answers": {
+        "q1_current_status": "Other",
+        "q2_gpa_range": "Below 2.50",
+        "q3_undergraduate_field": "Other",
+        "q4_master_interest": "I am still exploring",
+        "q5_scholarship_direction": "I do not know yet",
+        "q6_application_timeline": "I am still exploring",
+        "q7_leadership_experience": "Not yet",
+        "q8_impact_experience": "Not yet",
+        "q9_recognized_programs": "Not yet",
+        "q10_achievements": "Not yet",
+        "q11_skill_profile": "Not yet developed",
+        "q12_english_certificate": "Not yet",
+        "q13_storytelling_confidence": "I have never prepared my story",
+        "q14_cv_status": "No CV yet",
+        "q15_essay_status": "No essay yet",
+        "q16_application_knowledge": "I do not know where to start",
+        "q17_previous_application": "Yes, but I was rejected",
+        "q18_rejection_analysis": "No, I was not sure why I was rejected",
+        "q19_biggest_challenge": "I do not know how to start",
+        "q20_cv_upload": "I am not sure what to improve yet"
+    }
+}
