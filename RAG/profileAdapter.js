@@ -1,88 +1,67 @@
-function adaptAssessmentProfile(
-    deepProfile
-) {
+function adaptAssessmentProfile(profile) {
 
+    // Support both formats:
+    // 1. buildDeepProfile() -> { student_profile: {...} }
+    // 2. already flattened profile -> { academic: {...} }
+
+    const student =
+        profile.student_profile || profile;
 
     return {
 
-
         nationality:
-            deepProfile.nationality || "Indonesia",
-
-
+            student.nationality || "Indonesia",
 
         study_field:
-            deepProfile.academic?.study_direction
-            ||
+            student.academic?.study_direction ||
+            student.career?.contribution_area ||
             "General",
-
-
 
         target_degree:
             "Master",
 
-
-
         leadership:
-            !!deepProfile.leadership?.experience,
-
-
+            !!(
+                student.leadership?.experience &&
+                student.leadership.experience.length > 0
+            ),
 
         impact:
-            !!deepProfile.leadership?.impact,
-
-
+            !!student.leadership?.impact,
 
         english:
-            deepProfile.english
-            ||
-            "Not ready",
-
-
+            student.english || "Not ready",
 
         academic_profile: {
 
             academic_strength:
-                deepProfile.academic?.academic_strength
-                ||
+                student.academic?.academic_strength ||
                 "Average"
 
         },
 
-
-
         work_experience_years:
-            deepProfile.work_experience_years || 0,
-
-
+            student.work_experience_years || 0,
 
         application_readiness: {
 
             cv:
-                deepProfile.application_readiness?.cv
-                ||
+                student.application_readiness?.cv_strength ||
                 "needs_improvement",
 
-
             essay:
-                deepProfile.application_readiness?.essay
-                ||
+                student.application_readiness?.essay_readiness ||
                 "not_started"
 
         },
 
-
         scholarship_preferences:
-            deepProfile.scholarship_preferences || {}
+            student.scholarship_preferences || {}
 
     };
 
 }
 
-
-
 module.exports = {
-
     adaptAssessmentProfile
-
 };

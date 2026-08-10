@@ -1,12 +1,14 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
-
+const dashboardRoute =
+    require("./routes/dashboardRoute");
 const essayRoute = require("./routes/essay");
 const ocrRoute = require("./routes/ocr");
 const assessmentRoute = require("./routes/assessment");
 const deepAssessmentRoute = require("./routes/deepAssessmentRoute");
-
+const scholarshipRoute =
+require("./routes/scholarshipRoute");
 const app = express();
 
 
@@ -32,8 +34,14 @@ app.use("/api/ocr", ocrRoute);
 
 app.use("/api/assessment", assessmentRoute);
 app.use("/api/assessment", deepAssessmentRoute);
-
-
+app.use(
+    "/api/dashboard",
+    dashboardRoute
+);
+app.use(
+    "/api/scholarship",
+    scholarshipRoute
+);
 const PORT = process.env.PORT || 3001;
 
 

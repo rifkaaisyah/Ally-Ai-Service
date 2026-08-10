@@ -3,44 +3,37 @@ const express = require("express");
 const router = express.Router();
 
 const {
-    analyzeDeepAssessment
-} = require("../services/deepAssessmentService");
+    getScholarshipRecommendation
+} = require("../rag/ragService");
 
 
-
-router.post("/deep", (req,res)=>{
+router.post("/recommend", async (req, res)=>{
 
     try {
 
-
         const {
-            answers,
-            uploads
+            profile
         } = req.body;
 
 
-
-        if(!answers){
+        if(!profile){
 
             return res.status(400).json({
 
                 status:"error",
 
                 message:
-                "Assessment answers are required"
+                "Student profile is required"
 
             });
 
         }
 
 
-
         const result =
-            analyzeDeepAssessment(
-                answers,
-                uploads || {}
+            await getScholarshipRecommendation(
+                profile
             );
-
 
 
         return res.json({
@@ -48,25 +41,18 @@ router.post("/deep", (req,res)=>{
             status:"success",
 
             message:
-            "Deep assessment analyzed successfully",
+            "Scholarship recommendation generated successfully",
 
-            data:{
-
-                assessment:
-                result.assessment
-
-            }
+            data: result
 
         });
-
 
 
     }
     catch(error){
 
-
         console.error(
-            "Deep Assessment Error:",
+            "Scholarship Recommendation Error:",
             error
         );
 
@@ -79,9 +65,7 @@ router.post("/deep", (req,res)=>{
 
         });
 
-
     }
-
 
 });
 
