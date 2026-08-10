@@ -7,9 +7,18 @@ const {
 } = require("./progressService");
 
 
+/**
+ * Submit a student's answer for a task.
+ *
+ * The task is identified by taskId and
+ * looked up inside the supplied journey.
+ *
+ * This keeps the service compatible with
+ * dynamically generated journeys.
+ */
 async function submitTaskAnswer({
     journey,
-    task,
+    taskId,
     studentAnswer,
     scholarship
 }) {
@@ -20,9 +29,9 @@ async function submitTaskAnswer({
         );
     }
 
-    if (!task) {
+    if (!taskId) {
         throw new Error(
-            "Task is required"
+            "Task ID is required"
         );
     }
 
@@ -37,7 +46,27 @@ async function submitTaskAnswer({
 
 
     /*
-     * 1. Ask AI to evaluate the answer.
+     * 1. Find the task inside the
+     *    student's generated journey.
+     */
+
+    const task =
+        findTask(
+            journey,
+            taskId
+        );
+
+
+    if (!task) {
+        throw new Error(
+            `Task not found: ${taskId}`
+        );
+    }
+
+
+    /*
+     * 2. Ask the AI to evaluate
+     *    the student's answer.
      */
 
     const evaluation =
@@ -53,7 +82,8 @@ async function submitTaskAnswer({
 
 
     /*
-     * 2. Find tasks that are already completed.
+     * 3. Get the task IDs that are
+     *    already completed.
      */
 
     const completedTaskIds =
@@ -63,8 +93,9 @@ async function submitTaskAnswer({
 
 
     /*
-     * 3. Only add this task when
-     *    the AI considers it complete.
+     * 4. Only mark this task as
+     *    completed when the evaluator
+     *    allows completion.
      */
 
     if (
@@ -73,12 +104,12 @@ async function submitTaskAnswer({
 
         if (
             !completedTaskIds.includes(
-                task.id
+                taskId
             )
         ) {
 
             completedTaskIds.push(
-                task.id
+                taskId
             );
 
         }
@@ -87,7 +118,15 @@ async function submitTaskAnswer({
 
 
     /*
-     * 4. Recalculate the journey.
+     * 5. Recalculate the complete
+     *    journey using the existing
+     *    progress service.
+     *
+     *    If the evaluation failed,
+     *    the existing completed task
+     *    IDs are preserved, so this
+     *    submission does not complete
+     *    the task.
      */
 
     const updatedJourney =
@@ -97,14 +136,86 @@ async function submitTaskAnswer({
         );
 
 
+    /*
+     * 6. Find the updated task so
+     *    the frontend can immediately
+     *    see its completion state.
+     */
+
+    const updatedTask =
+        findTask(
+            updatedJourney,
+            taskId
+        );
+
+
     return {
 
+        success: true,
+
         evaluation,
+
+        task: {
+
+            id: taskId,
+
+            completed:
+                updatedTask
+                    ? updatedTask.completed
+                    : false
+
+        },
 
         journey:
             updatedJourney
 
     };
+
+}
+
+
+/**
+ * Find a task anywhere inside
+ * the student's generated journey.
+ *
+ * No task IDs are hardcoded here.
+ */
+function findTask(
+    journey,
+    taskId
+) {
+
+    for (
+        const valley
+        of journey.valleys || []
+    ) {
+
+        for (
+            const checkpoint
+            of valley.checkpoints || []
+        ) {
+
+            for (
+                const task
+                of checkpoint.tasks || []
+            ) {
+
+                if (
+                    task.id === taskId
+                ) {
+
+                    return task;
+
+                }
+
+            }
+
+        }
+
+    }
+
+    return null;
+
 }
 
 
@@ -152,6 +263,7 @@ function getCompletedTaskIds(
 
 
     return completedIds;
+
 }
 
 

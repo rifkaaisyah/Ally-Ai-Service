@@ -11,6 +11,8 @@ const scholarshipRoute =
 require("./routes/scholarshipRoute");
 const app = express();
 const testErrorRoute = require("./testErrorRoute");
+const journeyRoute =
+    require("./routes/journey");
 
 
 app.use(cors());
@@ -46,7 +48,10 @@ app.use(
 app.use("/test", testErrorRoute);
 const PORT = process.env.PORT || 3001;
 
-
+app.use(
+    "/api/journey",
+    journeyRoute
+);
 app.listen(PORT, ()=>{
 
     console.log(

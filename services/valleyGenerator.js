@@ -10,7 +10,6 @@ const {
  * This version does not use an LLM.
  * It creates deterministic frontend-ready JSON.
  */
-
 function generateValleys(
     studentProfile,
     journeyPlan,
@@ -119,6 +118,9 @@ function generateValleys(
 
     /*
      * Add journey metadata
+     *
+     * Also initialize every checkpoint
+     * and every task.
      */
 
     return {
@@ -152,7 +154,6 @@ function generateValleys(
             null,
 
         valleys:
-
             valleys.map(
                 (valley, index) => ({
 
@@ -170,7 +171,34 @@ function generateValleys(
                         0,
 
                     completed:
-                        false
+                        false,
+
+                    checkpoints:
+                        (valley.checkpoints || []).map(
+                            checkpoint => ({
+
+                                ...checkpoint,
+
+                                tasks:
+                                    (checkpoint.tasks || []).map(
+                                        task => ({
+
+                                            ...task,
+
+                                            completed:
+                                                false
+
+                                        })
+                                    ),
+
+                                progress:
+                                    0,
+
+                                completed:
+                                    false
+
+                            })
+                        )
 
                 })
             )
@@ -187,7 +215,6 @@ function generateValleys(
  * one student's completed tasks to modify
  * the original template.
  */
-
 function cloneTemplate(type) {
 
     const template =
