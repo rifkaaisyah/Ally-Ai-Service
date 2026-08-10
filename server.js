@@ -10,6 +10,7 @@ const deepAssessmentRoute = require("./routes/deepAssessmentRoute");
 const scholarshipRoute =
 require("./routes/scholarshipRoute");
 const app = express();
+const testErrorRoute = require("./testErrorRoute");
 
 
 app.use(cors());
@@ -42,6 +43,7 @@ app.use(
     "/api/scholarship",
     scholarshipRoute
 );
+app.use("/test", testErrorRoute);
 const PORT = process.env.PORT || 3001;
 
 

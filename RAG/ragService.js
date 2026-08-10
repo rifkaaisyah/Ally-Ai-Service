@@ -34,6 +34,10 @@ const {
     generateRoadmap
 } = require("../services/roadmapService");
 
+const {
+    attachDeadlineInformation
+} = require("../services/scholarshipDeadlineService");
+
 async function getScholarshipRecommendation(
     studentProfile
 ) {
@@ -104,17 +108,22 @@ const rankedScholarships =
 
 
 const topScholarships =
-    rankedScholarships.slice(0,3);
+    rankedScholarships.slice(0, 3);
+
+const scholarshipsWithDeadlines =
+    attachDeadlineInformation(
+        topScholarships
+    );
     // 7. Build the prompt
     const roadmap =
     generateRoadmap(
         studentProfile,
-        topScholarships
+        scholarshipsWithDeadlines
     );
  const prompt =
     buildScholarshipPrompt(
         userQuery,
-        topScholarships,
+        scholarshipsWithDeadlines,
         roadmap
     );
 
@@ -128,18 +137,13 @@ const topScholarships =
 
 
     return {
-
     recommendedScholarships:
-        topScholarships,
+        scholarshipsWithDeadlines,
 
-    roadmap:
-
-        roadmap,
+    roadmap,
 
     aiRecommendation:
-
         answer
-
 };
 
 }

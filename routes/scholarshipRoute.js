@@ -51,22 +51,23 @@ router.post("/recommend", async (req, res)=>{
     }
     catch(error){
 
-        console.error(
-            "Scholarship Recommendation Error:",
-            error
-        );
+    // Log the detailed error on the server
+    console.error(
+        "Scholarship Recommendation Error:",
+        error
+    );
 
+    // Show a safe fallback message to the user
+    return res.status(503).json({
 
-        return res.status(500).json({
+        status: "fallback",
 
-            status:"error",
+        message:
+            "Ally is taking a short break. Your checklist and roadmap are still available."
 
-            message:error.message
+    });
 
-        });
-
-    }
-
+}
 });
 
 

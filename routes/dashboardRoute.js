@@ -6,12 +6,40 @@ const {
     generateDashboard
 } = require("../services/dashboardService");
 
-router.post("/", (req, res) => {
+
+router.post("/", async (req, res) => {
 
     try {
 
+        const {
+            answers,
+            uploads
+        } = req.body;
+
+
+        if (!answers) {
+
+            return res.status(400).json({
+
+                status: "error",
+
+                message:
+                    "Assessment answers are required"
+
+            });
+
+        }
+
+
         const result =
-            generateDashboard(req.body);
+            await generateDashboard({
+
+                answers,
+
+                uploads: uploads || {}
+
+            });
+
 
         return res.json({
 
@@ -27,7 +55,11 @@ router.post("/", (req, res) => {
     }
     catch (error) {
 
-        console.error(error);
+        console.error(
+            "Dashboard Error:",
+            error
+        );
+
 
         return res.status(500).json({
 
@@ -40,5 +72,6 @@ router.post("/", (req, res) => {
     }
 
 });
+
 
 module.exports = router;
