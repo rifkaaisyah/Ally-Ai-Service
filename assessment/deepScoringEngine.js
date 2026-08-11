@@ -6,15 +6,27 @@ function calculateDeepReadiness(profile) {
     const improvements = [];
 
     const student =
-        profile.student_profile;
+        profile?.student_profile;
+
+
+    if (!student) {
+
+        throw new Error(
+            "Student profile is required for deep readiness calculation"
+        );
+
+    }
 
 
     /*
-    Academic Direction
-    */
+     * ==========================================
+     * ACADEMIC DIRECTION
+     * Maximum: 20
+     * ==========================================
+     */
 
     if (
-        student.academic.master_motivation
+        student.academic?.master_motivation
     ) {
 
         score += 10;
@@ -27,11 +39,13 @@ function calculateDeepReadiness(profile) {
 
 
     if (
-        student.academic.study_plan_clarity
+        student.academic?.study_plan_clarity
     ) {
 
         const clarity =
-            student.academic.study_plan_clarity.toLowerCase();
+            String(
+                student.academic.study_plan_clarity
+            ).toLowerCase();
 
 
         if (
@@ -46,7 +60,6 @@ function calculateDeepReadiness(profile) {
             );
 
         }
-
         else {
 
             score += 5;
@@ -60,18 +73,31 @@ function calculateDeepReadiness(profile) {
     }
 
 
-
     /*
-    Academic Experience
-    */
+     * ==========================================
+     * ACADEMIC EXPERIENCE
+     * Maximum: 15
+     * ==========================================
+     */
 
     const academicExperience =
-        student.academic.academic_experiences || [];
+        student.academic?.academic_experiences || [];
+
+
+    const academicExperienceList =
+        Array.isArray(academicExperience)
+            ? academicExperience
+            : [academicExperience];
 
 
     if (
-        academicExperience.length > 0 &&
-        !academicExperience.includes("none")
+        academicExperienceList.length > 0 &&
+        !academicExperienceList.some(
+            experience =>
+                String(experience)
+                    .toLowerCase()
+                    .includes("none")
+        )
     ) {
 
         score += 15;
@@ -81,7 +107,6 @@ function calculateDeepReadiness(profile) {
         );
 
     }
-
     else {
 
         score += 5;
@@ -93,24 +118,26 @@ function calculateDeepReadiness(profile) {
     }
 
 
-
     /*
-    Project Experience
-    */
+     * ==========================================
+     * PROJECT EXPERIENCE
+     * Maximum: 10
+     * ==========================================
+     */
 
     const project =
-        student.academic.field_project_experience;
+        student.academic?.field_project_experience;
 
 
-    if(project){
+    if (project) {
 
         const projectText =
-            project.toLowerCase();
+            String(project).toLowerCase();
 
 
-        if(
+        if (
             projectText.includes("multiple")
-        ){
+        ) {
 
             score += 10;
 
@@ -120,19 +147,27 @@ function calculateDeepReadiness(profile) {
 
         }
 
-        else if(
+        else if (
             projectText.includes("major")
-        ){
+        ) {
 
             score += 8;
 
+            strengths.push(
+                "substantial project experience"
+            );
+
         }
 
-        else if(
+        else if (
             projectText.includes("some")
-        ){
+        ) {
 
             score += 5;
+
+            strengths.push(
+                "project experience"
+            );
 
         }
 
@@ -147,21 +182,41 @@ function calculateDeepReadiness(profile) {
         }
 
     }
+    else {
 
+        improvements.push(
+            "strengthen project portfolio"
+        );
+
+    }
 
 
     /*
-    Leadership
-    */
+     * ==========================================
+     * LEADERSHIP
+     * Maximum: 15
+     * ==========================================
+     */
 
     const leadership =
-        student.leadership.experience || [];
+        student.leadership?.experience || [];
 
 
-    if(
-        leadership.length > 0 &&
-        !leadership.includes("none")
-    ){
+    const leadershipList =
+        Array.isArray(leadership)
+            ? leadership
+            : [leadership];
+
+
+    if (
+        leadershipList.length > 0 &&
+        !leadershipList.some(
+            experience =>
+                String(experience)
+                    .toLowerCase()
+                    .includes("none")
+        )
+    ) {
 
         score += 15;
 
@@ -170,7 +225,6 @@ function calculateDeepReadiness(profile) {
         );
 
     }
-
     else {
 
         score += 5;
@@ -182,24 +236,28 @@ function calculateDeepReadiness(profile) {
     }
 
 
-
     /*
-    Leadership Impact
-    */
+     * ==========================================
+     * LEADERSHIP IMPACT
+     * Maximum: 5
+     * ==========================================
+     */
 
-    if(
-        student.leadership.impact
-    ){
+    if (
+        student.leadership?.impact
+    ) {
 
         const impact =
-            student.leadership.impact.toLowerCase();
+            String(
+                student.leadership.impact
+            ).toLowerCase();
 
 
-        if(
+        if (
             impact.includes("impact") ||
             impact.includes("community") ||
             impact.includes("result")
-        ){
+        ) {
 
             score += 5;
 
@@ -208,7 +266,6 @@ function calculateDeepReadiness(profile) {
             );
 
         }
-
         else {
 
             score += 2;
@@ -220,24 +277,35 @@ function calculateDeepReadiness(profile) {
         }
 
     }
+    else {
 
+        improvements.push(
+            "document your leadership impact"
+        );
+
+    }
 
 
     /*
-    Career Direction
-    */
+     * ==========================================
+     * CAREER DIRECTION
+     * Maximum: 10
+     * ==========================================
+     */
 
-    if(
-        student.career.goal
-    ){
+    if (
+        student.career?.goal
+    ) {
 
         const goal =
-            student.career.goal.toLowerCase();
+            String(
+                student.career.goal
+            ).toLowerCase();
 
 
-        if(
+        if (
             !goal.includes("exploring")
-        ){
+        ) {
 
             score += 10;
 
@@ -246,7 +314,6 @@ function calculateDeepReadiness(profile) {
             );
 
         }
-
         else {
 
             score += 5;
@@ -258,69 +325,136 @@ function calculateDeepReadiness(profile) {
         }
 
     }
+    else {
 
+        improvements.push(
+            "clarify your career direction"
+        );
+
+    }
 
 
     /*
-    Application Readiness
-    */
+     * ==========================================
+     * APPLICATION READINESS
+     * Maximum: 15
+     * ==========================================
+     */
 
-
-    if(
-        student.application_readiness.cv_strength
-    ){
-
-        score += 5;
-
-    }
-
-
-    if(
-        student.application_readiness.essay_readiness
-    ){
+    if (
+        student.application_readiness?.cv_strength
+    ) {
 
         score += 5;
 
     }
+    else {
+
+        improvements.push(
+            "strengthen your CV"
+        );
+
+    }
 
 
-    if(
-        student.application_readiness.recommendation_status
-    ){
+    if (
+        student.application_readiness?.essay_readiness
+    ) {
 
         score += 5;
 
     }
+    else {
 
+        improvements.push(
+            "develop your scholarship essay story"
+        );
+
+    }
+
+
+    if (
+        student.application_readiness?.recommendation_status
+    ) {
+
+        score += 5;
+
+    }
+    else {
+
+        improvements.push(
+            "start preparing recommendation letters"
+        );
+
+    }
 
 
     /*
-    Preparation Timeline
-    */
+     * ==========================================
+     * PREPARATION TIMELINE
+     * Maximum: 5
+     * ==========================================
+     */
 
-    if(
-        student.preparation.available_time
-    ){
+    if (
+        student.preparation?.available_time
+    ) {
 
         score += 5;
 
     }
+    else {
 
+        improvements.push(
+            "plan enough preparation time before the application deadline"
+        );
+
+    }
+
+
+    /*
+     * ==========================================
+     * FINAL READINESS
+     *
+     * We intentionally cap readiness at 95%.
+     *
+     * 95% = very strong preparation.
+     * 100% is intentionally not awarded.
+     * ==========================================
+     */
+
+    const revised_percentage =
+        Math.min(
+            score,
+            95
+        );
+
+
+    /*
+     * Remove duplicate suggestions.
+     */
+
+    const uniqueStrengths =
+        [...new Set(strengths)];
+
+
+    const uniqueImprovements =
+        [...new Set(improvements)];
 
 
     return {
 
-        revised_percentage:
-            Math.min(score,100),
+        revised_percentage,
 
-        strengths,
+        strengths:
+            uniqueStrengths,
 
-        improvements
+        improvements:
+            uniqueImprovements
 
     };
 
 }
-
 
 
 module.exports = {

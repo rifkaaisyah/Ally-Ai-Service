@@ -6,8 +6,72 @@
   "strategy": "conservative",
   "feasibility": "unknown",
   "urgency": "normal",
-  "readiness": 67,
+  "readiness": 87,
   "valleys": [
+    {
+      "id": "research-valley",
+      "name": "Research Valley",
+      "objective": "Strengthen your research profile and prepare strong evidence of your academic work.",
+      "checkpoints": [
+        {
+          "id": "research-portfolio",
+          "title": "Build Your Research Portfolio",
+          "description": "Organize your research experience, projects, publications and academic achievements.",
+          "tasks": [
+            {
+              "id": "research-collect",
+              "title": "Collect your research projects",
+              "description": "List the research projects you have participated in.",
+              "type": "evidence",
+              "completed": true
+            },
+            {
+              "id": "research-contribution",
+              "title": "Explain your contribution",
+              "description": "For each project, explain what you personally contributed.",
+              "type": "reflection",
+              "completed": true
+            },
+            {
+              "id": "research-achievements",
+              "title": "Highlight research achievements",
+              "description": "Add publications, presentations, awards or other research achievements.",
+              "type": "evidence",
+              "completed": true
+            }
+          ],
+          "progress": 100,
+          "completed": true
+        },
+        {
+          "id": "research-proposal",
+          "title": "Strengthen Your Research Direction",
+          "description": "Develop a clear research direction that connects your academic background with your future goals.",
+          "tasks": [
+            {
+              "id": "research-topic",
+              "title": "Define your research topic",
+              "description": "Write a short explanation of the research problem you want to explore.",
+              "type": "writing",
+              "completed": true
+            },
+            {
+              "id": "research-impact",
+              "title": "Explain the potential impact",
+              "description": "Explain why your research matters and who could benefit from it.",
+              "type": "writing",
+              "completed": true
+            }
+          ],
+          "progress": 100,
+          "completed": true
+        }
+      ],
+      "order": 1,
+      "status": "completed",
+      "progress": 100,
+      "completed": true
+    },
     {
       "id": "leadership-valley",
       "name": "Leadership Valley",
@@ -23,25 +87,25 @@
               "title": "List your leadership experiences",
               "description": "Write down organizations, projects, teams or initiatives you have led.",
               "type": "evidence",
-              "completed": true
+              "completed": false
             },
             {
               "id": "leadership-role",
               "title": "Describe your role",
               "description": "Explain what you were responsible for in each leadership experience.",
               "type": "reflection",
-              "completed": true
+              "completed": false
             },
             {
               "id": "leadership-impact",
               "title": "Measure your impact",
               "description": "Add measurable results such as people reached, money raised, projects completed or improvements achieved.",
               "type": "evidence",
-              "completed": true
+              "completed": false
             }
           ],
-          "progress": 100,
-          "completed": true
+          "progress": 0,
+          "completed": false
         },
         {
           "id": "leadership-story",
@@ -67,9 +131,9 @@
           "completed": false
         }
       ],
-      "order": 1,
+      "order": 2,
       "status": "current",
-      "progress": 60,
+      "progress": 0,
       "completed": false
     },
     {
@@ -147,7 +211,7 @@
           "completed": false
         }
       ],
-      "order": 2,
+      "order": 3,
       "status": "locked",
       "progress": 0,
       "completed": false
@@ -218,10 +282,14 @@
           "completed": false
         }
       ],
-      "order": 3,
+      "order": 4,
       "status": "locked",
       "progress": 0,
       "completed": false
     }
-  ]
+  ],
+  "assessment": {
+    "assessment_number": 2,
+    "revised_percentage": 87
+  }
 }

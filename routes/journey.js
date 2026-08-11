@@ -26,9 +26,8 @@ const {
 
 
 /*
-=========================================================
+=====================================================
 CREATE JOURNEY
-=========================================================
 
 POST /api/journey
 
@@ -43,8 +42,6 @@ Expected body:
 
     "uploads": {},
 
-    "readiness": 67,
-
     "scholarship": {
         "id": "chevening-001",
         "name": "Chevening Scholarship"
@@ -53,19 +50,21 @@ Expected body:
 
 Flow:
 
-Assessment 2
-    ↓
-readiness
-    ↓
-deep assessment profile
-    ↓
-journey planner
-    ↓
-valley generator
-    ↓
-save journey
+Assessment 2 answers
+        ↓
+Deep Assessment
+        ↓
+revised_percentage
+        ↓
+student profile
+        ↓
+Journey Planner
+        ↓
+Valley Generator
+        ↓
+Save Journey
+=====================================================
 */
-
 
 router.post(
     "/",
@@ -77,8 +76,7 @@ router.post(
                 studentId,
                 answers,
                 uploads,
-                scholarship,
-                readiness
+                scholarship
             } = req.body;
 
 
@@ -146,7 +144,7 @@ router.post(
             -------------------------------------------------
             If this student already has a journey,
             return the existing journey.
-            
+
             This prevents completed progress from
             being destroyed by generating a new journey.
             -------------------------------------------------
@@ -182,9 +180,18 @@ router.post(
 
 
             /*
-            -------------------------------------------------
-            1. Analyze Assessment 2 answers
-            -------------------------------------------------
+            =================================================
+            1. ANALYZE ASSESSMENT 2
+            =================================================
+
+            The Deep Assessment calculates readiness.
+
+            answers
+                ↓
+            analyzeDeepAssessment()
+                ↓
+            revised_percentage = 84
+            =================================================
             */
 
             const deepAssessment =
@@ -204,56 +211,70 @@ router.post(
                 deepAssessment.profile;
 
 
+            if (!profile) {
+
+                throw new Error(
+                    "Deep assessment did not return a student profile"
+                );
+
+            }
+
+
             /*
-            -------------------------------------------------
-            Assessment 2 readiness
-           
-            In the real system:
+            =================================================
+            2. GET CALCULATED ASSESSMENT 2 READINESS
+            =================================================
 
-            FE
-              ↓
-            BE
-              ↓
-            Assessment 2 result
-              ↓
-            Ally AI
+            IMPORTANT:
 
-            For now, our test script sends:
+            We do NOT expect the frontend to send readiness.
 
-            readiness: 67
+            The readiness comes directly from:
 
-            We place that value into the profile so the
-            Journey Planner can use it.
-            -------------------------------------------------
+            deepAssessment.assessment.revised_percentage
+            =================================================
             */
 
+            const calculatedReadiness =
+                Number(
+                    deepAssessment
+                        ?.assessment
+                        ?.revised_percentage
+                );
+
+
             if (
-                readiness !== undefined &&
-                readiness !== null
+                Number.isNaN(
+                    calculatedReadiness
+                )
             ) {
 
-                const numericReadiness =
-                    Number(readiness);
-
-
-                if (
-                    !Number.isNaN(
-                        numericReadiness
-                    )
-                ) {
-
-                    profile.readiness =
-                        numericReadiness;
-
-                }
+                throw new Error(
+                    "Assessment 2 did not return a valid revised readiness percentage"
+                );
 
             }
 
 
             /*
             -------------------------------------------------
-            2. Plan the student's journey
+            Put calculated readiness into student profile.
             -------------------------------------------------
+            */
+
+            profile.readiness =
+                calculatedReadiness;
+
+
+            /*
+            =================================================
+            3. PLAN THE STUDENT JOURNEY
+            =================================================
+
+            The planner receives the profile containing:
+
+            profile.readiness = 84
+            =================================================
             */
 
             const journeyPlan =
@@ -264,9 +285,9 @@ router.post(
 
 
             /*
-            -------------------------------------------------
-            3. Generate personalized valleys and tasks
-            -------------------------------------------------
+            =================================================
+            4. GENERATE PERSONALIZED VALLEYS AND TASKS
+            =================================================
             */
 
             const journey =
@@ -278,39 +299,47 @@ router.post(
 
 
             /*
-            -------------------------------------------------
-            Make sure the journey exposes the same readiness
-            value that was used by the planner.
-            -------------------------------------------------
+            =================================================
+            5. EXPOSE ASSESSMENT 2 READINESS ON JOURNEY
+            =================================================
+
+            The journey uses exactly the same readiness
+            calculated by Assessment 2.
+            =================================================
             */
 
-            if (
-                readiness !== undefined &&
-                readiness !== null
-            ) {
-
-                const numericReadiness =
-                    Number(readiness);
-
-
-                if (
-                    !Number.isNaN(
-                        numericReadiness
-                    )
-                ) {
-
-                    journey.readiness =
-                        numericReadiness;
-
-                }
-
-            }
+            journey.readiness =
+                calculatedReadiness;
 
 
             /*
             -------------------------------------------------
-            4. Save journey
+            Also expose the Assessment 2 result.
+
+            Frontend can use:
+
+            journey.assessment.revised_percentage
+
+            instead of recalculating it.
             -------------------------------------------------
+            */
+
+            journey.assessment =
+                journey.assessment || {};
+
+
+            journey.assessment.assessment_number =
+                2;
+
+
+            journey.assessment.revised_percentage =
+                calculatedReadiness;
+
+
+            /*
+            =================================================
+            6. SAVE JOURNEY
+            =================================================
             */
 
             saveJourney(
@@ -320,9 +349,9 @@ router.post(
 
 
             /*
-            -------------------------------------------------
-            5. Return newly-created journey
-            -------------------------------------------------
+            =================================================
+            7. RETURN NEWLY CREATED JOURNEY
+            =================================================
             */
 
             return res.status(201).json({
@@ -365,16 +394,14 @@ router.post(
 
 
 /*
-=========================================================
+=====================================================
 GET JOURNEY
-=========================================================
 
 GET /api/journey/:studentId
 
 Loads the student's saved journey.
-=========================================================
+=====================================================
 */
-
 
 router.get(
     "/:studentId",
@@ -456,9 +483,8 @@ router.get(
 
 
 /*
-=========================================================
+=====================================================
 SUBMIT TASK ANSWER
-=========================================================
 
 POST /api/journey/task/evaluate
 
@@ -471,15 +497,8 @@ Expected body:
 
     "answer": "..."
 }
-
-The student's saved journey is loaded.
-The task is found dynamically.
-The answer is evaluated.
-Progress is updated.
-The updated journey is saved.
-=========================================================
+=====================================================
 */
-
 
 router.post(
     "/task/evaluate",
@@ -585,7 +604,7 @@ router.post(
 
             /*
             -------------------------------------------------
-            Evaluate answer against the student's journey
+            Evaluate answer against student's journey
             -------------------------------------------------
             */
 
