@@ -30,7 +30,7 @@
               "title": "Describe your role",
               "description": "Explain what you were responsible for in each leadership experience.",
               "type": "reflection",
-              "completed": false
+              "completed": true
             },
             {
               "id": "leadership-impact",
@@ -40,7 +40,7 @@
               "completed": false
             }
           ],
-          "progress": 33,
+          "progress": 67,
           "completed": false
         },
         {
@@ -69,7 +69,7 @@
       ],
       "order": 1,
       "status": "current",
-      "progress": 20,
+      "progress": 40,
       "completed": false
     },
     {
@@ -140,16 +140,16 @@
               "title": "Check scholarship alignment",
               "description": "Make sure your experiences and goals directly answer the scholarship criteria.",
               "type": "review",
-              "completed": false
+              "completed": true
             }
           ],
-          "progress": 0,
+          "progress": 50,
           "completed": false
         }
       ],
       "order": 2,
       "status": "locked",
-      "progress": 0,
+      "progress": 17,
       "completed": false
     },
     {

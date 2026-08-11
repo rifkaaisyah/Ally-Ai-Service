@@ -6,7 +6,7 @@
   "strategy": "conservative",
   "feasibility": "unknown",
   "urgency": "normal",
-  "readiness": 0,
+  "readiness": 67,
   "valleys": [
     {
       "id": "leadership-valley",
@@ -30,18 +30,18 @@
               "title": "Describe your role",
               "description": "Explain what you were responsible for in each leadership experience.",
               "type": "reflection",
-              "completed": true
+              "completed": false
             },
             {
               "id": "leadership-impact",
               "title": "Measure your impact",
               "description": "Add measurable results such as people reached, money raised, projects completed or improvements achieved.",
               "type": "evidence",
-              "completed": true
+              "completed": false
             }
           ],
-          "progress": 100,
-          "completed": true
+          "progress": 33,
+          "completed": false
         },
         {
           "id": "leadership-story",
@@ -53,24 +53,24 @@
               "title": "Write one STAR story",
               "description": "Describe one leadership experience using Situation, Task, Action and Result.",
               "type": "writing",
-              "completed": true
+              "completed": false
             },
             {
               "id": "leadership-lesson",
               "title": "Explain what you learned",
               "description": "Explain how the experience changed your leadership approach.",
               "type": "reflection",
-              "completed": true
+              "completed": false
             }
           ],
-          "progress": 100,
-          "completed": true
+          "progress": 0,
+          "completed": false
         }
       ],
       "order": 1,
-      "status": "completed",
-      "progress": 100,
-      "completed": true
+      "status": "current",
+      "progress": 20,
+      "completed": false
     },
     {
       "id": "essay-valley",
@@ -87,18 +87,18 @@
               "title": "Why this scholarship?",
               "description": "Write why you want this scholarship and what you hope to achieve.",
               "type": "writing",
-              "completed": true
+              "completed": false
             },
             {
               "id": "essay-university",
               "title": "Why this university?",
               "description": "Explain why the university and program are relevant to your goals.",
               "type": "writing",
-              "completed": true
+              "completed": false
             }
           ],
-          "progress": 100,
-          "completed": true
+          "progress": 0,
+          "completed": false
         },
         {
           "id": "essay-star",
@@ -110,18 +110,18 @@
               "title": "Write using the STAR method",
               "description": "Rewrite an important experience using Situation, Task, Action and Result.",
               "type": "writing",
-              "completed": true
+              "completed": false
             },
             {
               "id": "essay-impact",
               "title": "Add measurable impact",
               "description": "Include concrete outcomes instead of only describing what you did.",
               "type": "writing",
-              "completed": true
+              "completed": false
             }
           ],
-          "progress": 100,
-          "completed": true
+          "progress": 0,
+          "completed": false
         },
         {
           "id": "essay-review",
@@ -133,24 +133,24 @@
               "title": "Check your story flow",
               "description": "Make sure the essay has a clear beginning, development and conclusion.",
               "type": "review",
-              "completed": true
+              "completed": false
             },
             {
               "id": "essay-alignment",
               "title": "Check scholarship alignment",
               "description": "Make sure your experiences and goals directly answer the scholarship criteria.",
               "type": "review",
-              "completed": true
+              "completed": false
             }
           ],
-          "progress": 100,
-          "completed": true
+          "progress": 0,
+          "completed": false
         }
       ],
       "order": 2,
-      "status": "completed",
-      "progress": 100,
-      "completed": true
+      "status": "locked",
+      "progress": 0,
+      "completed": false
     },
     {
       "id": "application-valley",
@@ -167,25 +167,25 @@
               "title": "Update your CV",
               "description": "Make sure your CV reflects your strongest academic, professional and leadership achievements.",
               "type": "document",
-              "completed": true
+              "completed": false
             },
             {
               "id": "application-transcript",
               "title": "Prepare academic documents",
               "description": "Collect transcripts, certificates and other academic records.",
               "type": "document",
-              "completed": true
+              "completed": false
             },
             {
               "id": "application-recommendation",
               "title": "Prepare recommendation letters",
               "description": "Identify referees and request recommendation letters early.",
               "type": "document",
-              "completed": true
+              "completed": false
             }
           ],
-          "progress": 100,
-          "completed": true
+          "progress": 0,
+          "completed": false
         },
         {
           "id": "application-final-review",
@@ -197,31 +197,31 @@
               "title": "Check every requirement",
               "description": "Compare your application against the scholarship requirements.",
               "type": "review",
-              "completed": true
+              "completed": false
             },
             {
               "id": "application-proofread",
               "title": "Proofread everything",
               "description": "Check spelling, formatting and consistency across all application materials.",
               "type": "review",
-              "completed": true
+              "completed": false
             },
             {
               "id": "application-submit",
               "title": "Submit your application",
               "description": "Submit the completed application before the deadline.",
               "type": "submission",
-              "completed": true
+              "completed": false
             }
           ],
-          "progress": 100,
-          "completed": true
+          "progress": 0,
+          "completed": false
         }
       ],
       "order": 3,
-      "status": "completed",
-      "progress": 100,
-      "completed": true
+      "status": "locked",
+      "progress": 0,
+      "completed": false
     }
   ]
 }

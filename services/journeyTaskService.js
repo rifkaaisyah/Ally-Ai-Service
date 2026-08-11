@@ -8,13 +8,15 @@ const {
 
 
 /**
- * Submit a student's answer for a task.
+ * Submit a student's answer for a journey task.
  *
- * The task is identified by taskId and
- * looked up inside the supplied journey.
+ * The task is dynamically located inside
+ * the student's saved journey.
  *
- * This keeps the service compatible with
- * dynamically generated journeys.
+ * The task is marked completed ONLY when
+ * the current AI evaluation says:
+ *
+ *     canComplete === true
  */
 async function submitTaskAnswer({
     journey,
@@ -46,8 +48,9 @@ async function submitTaskAnswer({
 
 
     /*
-     * 1. Find the task inside the
-     *    student's generated journey.
+     * --------------------------------------------------
+     * 1. Find the task dynamically.
+     * --------------------------------------------------
      */
 
     const task =
@@ -65,8 +68,9 @@ async function submitTaskAnswer({
 
 
     /*
-     * 2. Ask the AI to evaluate
-     *    the student's answer.
+     * --------------------------------------------------
+     * 2. Evaluate the student's answer.
+     * --------------------------------------------------
      */
 
     const evaluation =
@@ -82,51 +86,50 @@ async function submitTaskAnswer({
 
 
     /*
-     * 3. Get the task IDs that are
-     *    already completed.
+     * --------------------------------------------------
+     * 3. Get all OTHER completed tasks.
+     *
+     * IMPORTANT:
+     *
+     * We deliberately remove the current task
+     * from the completion list first.
+     *
+     * This prevents an old/stale "completed: true"
+     * value from surviving when the current answer
+     * is rejected by the AI.
+     * --------------------------------------------------
      */
 
     const completedTaskIds =
         getCompletedTaskIds(
             journey
+        ).filter(
+            id => id !== taskId
         );
 
 
     /*
-     * 4. Only mark this task as
-     *    completed when the evaluator
-     *    allows completion.
+     * --------------------------------------------------
+     * 4. ONLY the current evaluation decides
+     *    whether this task is completed.
+     * --------------------------------------------------
      */
 
     if (
-        evaluation.canComplete
+        evaluation.canComplete === true
     ) {
 
-        if (
-            !completedTaskIds.includes(
-                taskId
-            )
-        ) {
-
-            completedTaskIds.push(
-                taskId
-            );
-
-        }
+        completedTaskIds.push(
+            taskId
+        );
 
     }
 
 
     /*
-     * 5. Recalculate the complete
-     *    journey using the existing
-     *    progress service.
-     *
-     *    If the evaluation failed,
-     *    the existing completed task
-     *    IDs are preserved, so this
-     *    submission does not complete
-     *    the task.
+     * --------------------------------------------------
+     * 5. Recalculate the entire journey.
+     * --------------------------------------------------
      */
 
     const updatedJourney =
@@ -137,9 +140,9 @@ async function submitTaskAnswer({
 
 
     /*
-     * 6. Find the updated task so
-     *    the frontend can immediately
-     *    see its completion state.
+     * --------------------------------------------------
+     * 6. Find the updated task.
+     * --------------------------------------------------
      */
 
     const updatedTask =
@@ -148,6 +151,12 @@ async function submitTaskAnswer({
             taskId
         );
 
+
+    /*
+     * --------------------------------------------------
+     * 7. Return everything needed by the route.
+     * --------------------------------------------------
+     */
 
     return {
 
@@ -170,15 +179,12 @@ async function submitTaskAnswer({
             updatedJourney
 
     };
-
 }
 
 
 /**
- * Find a task anywhere inside
- * the student's generated journey.
- *
- * No task IDs are hardcoded here.
+ * Find a task anywhere inside the
+ * student's generated journey.
  */
 function findTask(
     journey,
@@ -215,13 +221,11 @@ function findTask(
     }
 
     return null;
-
 }
 
 
 /**
- * Get all completed task IDs
- * from the current journey.
+ * Get all currently completed task IDs.
  */
 function getCompletedTaskIds(
     journey
@@ -263,7 +267,6 @@ function getCompletedTaskIds(
 
 
     return completedIds;
-
 }
 
 

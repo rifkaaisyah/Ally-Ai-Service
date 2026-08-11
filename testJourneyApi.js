@@ -18,8 +18,7 @@ doesn't get returned.
 */
 
 const studentId =
-    "student-readiness-67-demo-001";
-
+    "student-readiness-67-api-test-001";
 
 /*
 =========================================================
