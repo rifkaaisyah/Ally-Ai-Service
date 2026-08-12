@@ -9,11 +9,14 @@ const assessmentRoute = require("./routes/assessment");
 const deepAssessmentRoute = require("./routes/deepAssessmentRoute");
 const scholarshipRoute =
 require("./routes/scholarshipRoute");
+const mentorRoute =
+require("./routes/mentorRoute");
 const app = express();
 const testErrorRoute = require("./testErrorRoute");
 const journeyRoute =
     require("./routes/journey");
-
+const journeyDocumentRoute =
+require("./routes/journeyDocumentRoute");
 
 app.use(cors());
 
@@ -51,6 +54,14 @@ const PORT = process.env.PORT || 3001;
 app.use(
     "/api/journey",
     journeyRoute
+);
+app.use(
+    "/api/journey",
+    journeyDocumentRoute
+);
+app.use(
+    "/api/mentor",
+    mentorRoute
 );
 app.listen(PORT, ()=>{
 

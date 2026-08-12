@@ -15,6 +15,10 @@
             "Indonesia",
             "United Kingdom"
         ],
+        "scholarships": [
+            "Chevening Scholarship"
+        ],
+        "study_country": "United Kingdom",
         "leadership_experience": true,
         "bio": "AI professional with scholarship and postgraduate experience."
     },
@@ -33,6 +37,10 @@
             "Indonesia",
             "Japan"
         ],
+        "scholarships": [
+            "LPDP Scholarship"
+        ],
+        "study_country": "Japan",
         "leadership_experience": true,
         "bio": "Technology researcher and postgraduate scholarship mentor."
     },
@@ -52,6 +60,10 @@
             "Indonesia",
             "Australia"
         ],
+        "scholarships": [
+            "LPDP Scholarship"
+        ],
+        "study_country": "Australia",
         "leadership_experience": true,
         "bio": "Scholarship alumna focused on education and social impact."
     }

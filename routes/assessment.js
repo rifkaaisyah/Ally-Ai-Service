@@ -11,16 +11,60 @@ const {
 } = require("../assessment/answerNormalizer");
 
 
+/*
+=========================================================
+ASSESSMENT 1 — INITIAL READINESS
+=========================================================
+
+POST /api/assessment/readiness
+
+Expected body:
+
+{
+    "guest_token": "local-test-001",
+
+    "answers": {
+        ...
+    }
+}
+
+Flow:
+
+Assessment 1 answers
+        ↓
+normalizeAnswers()
+        ↓
+calculateReadiness()
+        ↓
+Initial readiness result
+=========================================================
+*/
 
 router.post("/readiness", (req, res) => {
 
     try {
 
+        /*
+        -------------------------------------------------
+        Get request data
+        -------------------------------------------------
+        */
+
         const answers =
-    normalizeAnswers(req.body.answers);
+            normalizeAnswers(
+                req.body.answers
+            );
 
-        const guestToken = req.body.guest_token || null;
 
+        const guestToken =
+            req.body.guest_token || null;
+
+
+        /*
+        -------------------------------------------------
+        Validate answers
+        -------------------------------------------------
+        */
 
         if (!answers) {
 
@@ -28,64 +72,69 @@ router.post("/readiness", (req, res) => {
 
                 status: "error",
 
-                message: "Assessment answers are required"
+                message:
+                    "Assessment answers are required"
 
             });
 
         }
 
 
-        // Existing Assessment 1 engine
-        const result = calculateReadiness(answers);
+        /*
+        -------------------------------------------------
+        Calculate Assessment 1 readiness
+        -------------------------------------------------
+        */
+
+        const result =
+            calculateReadiness(
+                answers
+            );
 
 
+        /*
+        -------------------------------------------------
+        Build Assessment 1 response
+        -------------------------------------------------
+        */
 
         const assessmentResponse = {
 
-            guest_token: guestToken,
+            guest_token:
+                guestToken,
 
-            assessment_type: "initial_diagnostic",
-
+            assessment_type:
+                "initial_diagnostic",
 
             readiness_percentage:
                 result.readiness_percentage,
 
-
             readiness_level:
                 result.readiness_level,
-
 
             reason:
                 result.reason,
 
-
             academic_score:
                 result.categories.academic,
-
 
             scholarship_goal_score:
                 result.categories.scholarship_goal,
 
-
             leadership_score:
                 result.categories.leadership,
-
 
             achievements_score:
                 result.categories.achievements,
 
-
             english_score:
                 result.categories.english,
-
 
             application_score:
                 result.categories.application,
 
-
             strengths_mapping:
                 result.strengths,
-
 
             improvements_mapping:
                 result.improvements
@@ -93,42 +142,50 @@ router.post("/readiness", (req, res) => {
         };
 
 
+        /*
+        -------------------------------------------------
+        Return successful response
+        -------------------------------------------------
+        */
 
-        res.json({
+        return res.json({
 
             status: "success",
 
             message:
                 "Assessment submitted and analyzed by AI successfully.",
 
-
             data: {
 
-                assessment: assessmentResponse
+                assessment:
+                    assessmentResponse
 
             }
 
         });
 
+    }
+
+    catch (error) {
+
+        console.error(
+            "Assessment 1 Error:",
+            error
+        );
 
 
-    } catch(error) {
+        return res.status(500).json({
 
-        console.error(error);
+            status: "error",
 
-
-        res.status(500).json({
-
-            status:"error",
-
-            message:"Assessment processing failed"
+            message:
+                "Assessment processing failed"
 
         });
 
     }
 
 });
-
 
 
 module.exports = router;

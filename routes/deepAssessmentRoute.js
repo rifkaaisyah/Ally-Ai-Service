@@ -7,10 +7,46 @@ const {
 } = require("../services/deepAssessmentService");
 
 
+/*
+=========================================================
+ASSESSMENT 2 — DEEP ASSESSMENT
+=========================================================
+
+POST /api/assessment/deep
+
+Expected body:
+
+{
+    "answers": {
+        ...
+    },
+
+    "uploads": {}
+}
+
+Flow:
+
+Assessment 2 answers
+        ↓
+analyzeDeepAssessment()
+        ↓
+student profile
+        ↓
+revised readiness
+        ↓
+scholarship recommendation
+=========================================================
+*/
 
 router.post("/deep", async (req, res) => {
 
     try {
+
+        /*
+        -------------------------------------------------
+        Get request data
+        -------------------------------------------------
+        */
 
         const {
             answers,
@@ -18,10 +54,11 @@ router.post("/deep", async (req, res) => {
         } = req.body;
 
 
-
-        // ---------------------------------------------------------
-        // 1. Validate answers
-        // ---------------------------------------------------------
+        /*
+        -------------------------------------------------
+        Validate answers
+        -------------------------------------------------
+        */
 
         if (!answers) {
 
@@ -37,10 +74,11 @@ router.post("/deep", async (req, res) => {
         }
 
 
-
-        // ---------------------------------------------------------
-        // 2. Run deep assessment
-        // ---------------------------------------------------------
+        /*
+        -------------------------------------------------
+        Run Assessment 2
+        -------------------------------------------------
+        */
 
         const result =
             await analyzeDeepAssessment(
@@ -49,12 +87,11 @@ router.post("/deep", async (req, res) => {
             );
 
 
-
-        // ---------------------------------------------------------
-        // 3. Validate result
-        //
-        // The journey engine needs the student profile.
-        // ---------------------------------------------------------
+        /*
+        -------------------------------------------------
+        Validate result
+        -------------------------------------------------
+        */
 
         if (!result) {
 
@@ -65,11 +102,20 @@ router.post("/deep", async (req, res) => {
         }
 
 
+        /*
+        -------------------------------------------------
+        Validate student profile
+        -------------------------------------------------
+        */
 
-        if (!result.profile) {
+        if (
+            !result.profile ||
+            !result.profile.student_profile
+        ) {
 
             console.error(
-                "Deep assessment result is missing profile:",
+                "Deep assessment result is missing student profile:",
+
                 JSON.stringify(
                     result,
                     null,
@@ -77,27 +123,44 @@ router.post("/deep", async (req, res) => {
                 )
             );
 
+
             throw new Error(
-                "Deep assessment did not return a student profile"
+                "Deep assessment did not return a valid student profile"
             );
 
         }
 
 
+        /*
+        -------------------------------------------------
+        Validate revised readiness
+        -------------------------------------------------
+        */
 
-        // ---------------------------------------------------------
-        // 4. Return assessment + profile
-        //
-        // IMPORTANT:
-        // Previously this route returned ONLY:
-        //
-        // data: {
-        //     assessment: result.assessment
-        // }
-        //
-        // That caused /api/journey to fail because it could not
-        // find the student profile.
-        // ---------------------------------------------------------
+        const revisedPercentage =
+            Number(
+                result.assessment?.revised_percentage
+            );
+
+
+        if (
+            Number.isNaN(
+                revisedPercentage
+            )
+        ) {
+
+            throw new Error(
+                "Deep assessment did not return a valid revised readiness percentage"
+            );
+
+        }
+
+
+        /*
+        -------------------------------------------------
+        Return Assessment 2
+        -------------------------------------------------
+        */
 
         return res.json({
 
@@ -108,26 +171,21 @@ router.post("/deep", async (req, res) => {
 
             data: {
 
-                // Assessment result
                 assessment:
                     result.assessment || null,
 
-
-                // Full profile object
                 profile:
                     result.profile || null,
 
-
-                // Convenient direct access for consumers
-                // that expect student_profile.
                 student_profile:
-                    result.profile?.student_profile || null
+                    result.profile.student_profile || null
 
             }
 
         });
 
     }
+
     catch (error) {
 
         console.error(
@@ -141,14 +199,14 @@ router.post("/deep", async (req, res) => {
             status: "error",
 
             message:
-                error.message
+                error.message ||
+                "Deep assessment processing failed"
 
         });
 
     }
 
 });
-
 
 
 module.exports = router;

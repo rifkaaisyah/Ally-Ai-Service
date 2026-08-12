@@ -2,13 +2,18 @@ const {
     getValleyTemplate
 } = require("./valleyTemplates");
 
-
 /**
  * Generate a gamified scholarship journey
  * from the journey planner result.
  *
  * This version does not use an LLM.
  * It creates deterministic frontend-ready JSON.
+ *
+ * IMPORTANT:
+ * - Keeps existing valley/task structure.
+ * - Does not change existing task IDs.
+ * - Does not change existing completion state.
+ * - Adds safe input metadata for future file/text submission.
  */
 function generateValleys(
     studentProfile,
@@ -17,20 +22,18 @@ function generateValleys(
 ) {
 
     if (!journeyPlan) {
-
         throw new Error(
             "Journey plan is required"
         );
-
     }
-
 
     const valleys = [];
 
-
     /*
-     * Research Valley
-     */
+    =================================================
+    RESEARCH VALLEY
+    =================================================
+    */
 
     if (
         studentProfile?.academic?.academic_experiences
@@ -38,9 +41,7 @@ function generateValleys(
     ) {
 
         const researchValley =
-            cloneTemplate(
-                "research"
-            );
+            cloneTemplate("research");
 
         if (researchValley) {
 
@@ -52,19 +53,18 @@ function generateValleys(
 
     }
 
-
     /*
-     * Leadership Valley
-     */
+    =================================================
+    LEADERSHIP VALLEY
+    =================================================
+    */
 
     if (
         studentProfile?.leadership
     ) {
 
         const leadershipValley =
-            cloneTemplate(
-                "leadership"
-            );
+            cloneTemplate("leadership");
 
         if (leadershipValley) {
 
@@ -76,18 +76,17 @@ function generateValleys(
 
     }
 
-
     /*
-     * Essay Valley
-     *
-     * Essays are useful for almost every
-     * major scholarship application.
-     */
+    =================================================
+    ESSAY VALLEY
+    =================================================
+
+    Essays are useful for almost every
+    major scholarship application.
+    */
 
     const essayValley =
-        cloneTemplate(
-            "essay"
-        );
+        cloneTemplate("essay");
 
     if (essayValley) {
 
@@ -97,15 +96,14 @@ function generateValleys(
 
     }
 
-
     /*
-     * Application Valley
-     */
+    =================================================
+    APPLICATION VALLEY
+    =================================================
+    */
 
     const applicationValley =
-        cloneTemplate(
-            "application"
-        );
+        cloneTemplate("application");
 
     if (applicationValley) {
 
@@ -115,30 +113,30 @@ function generateValleys(
 
     }
 
-
     /*
-     * Add journey metadata
-     *
-     * Also initialize every checkpoint
-     * and every task.
-     */
+    =================================================
+    BUILD FINAL JOURNEY
+    =================================================
+    */
 
     return {
 
-       scholarship: {
+        scholarship: {
 
-    id:
-        scholarship?.id || null,
+            id:
+                scholarship?.id ||
+                null,
 
-    name:
-        scholarship?.name ||
-        scholarship?.metadata?.name ||
-        null,
+            name:
+                scholarship?.name ||
+                scholarship?.metadata?.name ||
+                null,
 
-    deadline:
-        scholarship?.deadline || null
+            deadline:
+                scholarship?.deadline ||
+                null
 
-},
+        },
 
         strategy:
             journeyPlan.strategy ||
@@ -158,53 +156,220 @@ function generateValleys(
 
         valleys:
             valleys.map(
-                (valley, index) => ({
+                (valley, index) => {
 
-                    ...valley,
+                    /*
+                    -----------------------------------------
+                    Determine initial valley status
+                    -----------------------------------------
+                    */
 
-                    order:
-                        index + 1,
-
-                    status:
+                    const valleyStatus =
                         index === 0
                             ? "current"
-                            : "locked",
+                            : "locked";
 
-                    progress:
-                        0,
 
-                    completed:
-                        false,
+                    /*
+                    -----------------------------------------
+                    Prepare checkpoints
+                    -----------------------------------------
+                    */
 
-                    checkpoints:
-                        (valley.checkpoints || []).map(
-                            checkpoint => ({
-
-                                ...checkpoint,
-
-                                tasks:
-                                    (checkpoint.tasks || []).map(
-                                        task => ({
-
-                                            ...task,
-
-                                            completed:
-                                                false
-
-                                        })
-                                    ),
-
-                                progress:
-                                    0,
-
-                                completed:
-                                    false
-
-                            })
+                    const checkpoints =
+                        Array.isArray(
+                            valley.checkpoints
                         )
+                            ? valley.checkpoints
+                            : [];
 
-                })
+
+                    return {
+
+                        ...valley,
+
+                        order:
+                            index + 1,
+
+                        status:
+                            valleyStatus,
+
+                        progress:
+                            0,
+
+                        completed:
+                            false,
+
+                        checkpoints:
+                            checkpoints.map(
+                                checkpoint => {
+
+                                    const tasks =
+                                        Array.isArray(
+                                            checkpoint.tasks
+                                        )
+                                            ? checkpoint.tasks
+                                            : [];
+
+
+                                    return {
+
+                                        ...checkpoint,
+
+                                        progress:
+                                            0,
+
+                                        completed:
+                                            false,
+
+                                        tasks:
+                                            tasks.map(
+                                                task => {
+
+                                                    /*
+                                                    ---------------------------------
+                                                    Keep the original task unchanged
+                                                    and only add safe metadata.
+                                                    ---------------------------------
+                                                    */
+
+                                                    return {
+                                                        ...task,
+
+                                                        completed:
+                                                            false,
+
+                                                        input:
+                                                            getTaskInputConfig(
+                                                                task,
+                                                                valley
+                                                                    .id
+                                                            )
+
+                                                    };
+
+                                                }
+                                            )
+
+                                    };
+
+                                }
+                            )
+
+                    };
+
+                }
             )
+
+    };
+
+}
+
+
+/**
+ * Determine how a task can receive
+ * the student's work.
+ *
+ * This does NOT process files.
+ *
+ * It only tells the frontend/backend
+ * what kind of submission the task accepts.
+ */
+function getTaskInputConfig(
+    task,
+    valleyId
+) {
+
+    /*
+    =================================================
+    ESSAY TASKS
+    =================================================
+
+    Writing tasks can accept:
+    - typed text
+    - uploaded document
+    */
+
+    if (
+        valleyId === "essay-valley" ||
+        task?.type === "writing"
+    ) {
+
+        return {
+
+            mode: "text_or_file",
+
+            accepted_inputs: [
+                "text",
+                "file"
+            ],
+
+            accepted_file_types: [
+                "pdf",
+                "doc",
+                "docx",
+                "txt"
+            ]
+
+        };
+
+    }
+
+
+    /*
+    =================================================
+    APPLICATION DOCUMENT TASKS
+    =================================================
+
+    Document tasks are primarily file uploads.
+    */
+
+    if (
+        valleyId === "application-valley" &&
+        task?.type === "document"
+    ) {
+
+        return {
+
+            mode: "file",
+
+            accepted_inputs: [
+                "file"
+            ],
+
+            accepted_file_types: [
+                "pdf",
+                "doc",
+                "docx",
+                "txt",
+                "jpg",
+                "jpeg",
+                "png"
+            ]
+
+        };
+
+    }
+
+
+    /*
+    =================================================
+    DEFAULT
+    =================================================
+
+    Existing tasks continue behaving like
+    normal text tasks.
+    */
+
+    return {
+
+        mode: "text",
+
+        accepted_inputs: [
+            "text"
+        ],
+
+        accepted_file_types: []
 
     };
 
@@ -221,10 +386,7 @@ function generateValleys(
 function cloneTemplate(type) {
 
     const template =
-        getValleyTemplate(
-            type
-        );
-
+        getValleyTemplate(type);
 
     if (!template) {
 
@@ -232,6 +394,9 @@ function cloneTemplate(type) {
 
     }
 
+    /*
+    Safely clone the template.
+    */
 
     return JSON.parse(
         JSON.stringify(
@@ -243,5 +408,7 @@ function cloneTemplate(type) {
 
 
 module.exports = {
+
     generateValleys
+
 };

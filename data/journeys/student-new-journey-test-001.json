@@ -1,0 +1,607 @@
+{
+  "scholarship": {
+    "id": "lpdp-001",
+    "name": "LPDP Scholarship",
+    "deadline": "2027-06-01"
+  },
+  "strategy": "conservative",
+  "feasibility": "unknown",
+  "urgency": "normal",
+  "readiness": 0,
+  "valleys": [
+    {
+      "id": "leadership-valley",
+      "name": "Leadership Valley",
+      "objective": "Turn your leadership experiences into clear evidence of impact.",
+      "checkpoints": [
+        {
+          "id": "leadership-evidence",
+          "title": "Collect Leadership Evidence",
+          "description": "Document the leadership activities you have participated in.",
+          "tasks": [
+            {
+              "id": "leadership-activities",
+              "title": "List your leadership experiences",
+              "description": "Write down organizations, projects, teams or initiatives you have led.",
+              "type": "evidence",
+              "completed": false,
+              "input": {
+                "mode": "text",
+                "accepted_inputs": [
+                  "text"
+                ],
+                "accepted_file_types": []
+              },
+              "timeline": {
+                "start_date": "2026-08-12",
+                "target_date": "2026-08-18",
+                "status": "scheduled"
+              }
+            },
+            {
+              "id": "leadership-role",
+              "title": "Describe your role",
+              "description": "Explain what you were responsible for in each leadership experience.",
+              "type": "reflection",
+              "completed": false,
+              "input": {
+                "mode": "text",
+                "accepted_inputs": [
+                  "text"
+                ],
+                "accepted_file_types": []
+              },
+              "timeline": {
+                "start_date": "2026-08-19",
+                "target_date": "2026-08-25",
+                "status": "scheduled"
+              }
+            },
+            {
+              "id": "leadership-impact",
+              "title": "Measure your impact",
+              "description": "Add measurable results such as people reached, money raised, projects completed or improvements achieved.",
+              "type": "evidence",
+              "completed": false,
+              "input": {
+                "mode": "text",
+                "accepted_inputs": [
+                  "text"
+                ],
+                "accepted_file_types": []
+              },
+              "timeline": {
+                "start_date": "2026-08-26",
+                "target_date": "2026-09-01",
+                "status": "scheduled"
+              }
+            }
+          ],
+          "progress": 0,
+          "completed": false
+        },
+        {
+          "id": "leadership-story",
+          "title": "Build Your Leadership Stories",
+          "description": "Prepare strong stories that demonstrate your leadership ability.",
+          "tasks": [
+            {
+              "id": "leadership-star",
+              "title": "Write one STAR story",
+              "description": "Describe one leadership experience using Situation, Task, Action and Result.",
+              "type": "writing",
+              "completed": false,
+              "input": {
+                "mode": "text_or_file",
+                "accepted_inputs": [
+                  "text",
+                  "file"
+                ],
+                "accepted_file_types": [
+                  "pdf",
+                  "doc",
+                  "docx",
+                  "txt"
+                ]
+              },
+              "timeline": {
+                "start_date": "2026-09-02",
+                "target_date": "2026-09-08",
+                "status": "scheduled"
+              }
+            },
+            {
+              "id": "leadership-lesson",
+              "title": "Explain what you learned",
+              "description": "Explain how the experience changed your leadership approach.",
+              "type": "reflection",
+              "completed": false,
+              "input": {
+                "mode": "text",
+                "accepted_inputs": [
+                  "text"
+                ],
+                "accepted_file_types": []
+              },
+              "timeline": {
+                "start_date": "2026-09-09",
+                "target_date": "2026-09-15",
+                "status": "scheduled"
+              }
+            }
+          ],
+          "progress": 0,
+          "completed": false
+        }
+      ],
+      "order": 1,
+      "status": "current",
+      "progress": 0,
+      "completed": false
+    },
+    {
+      "id": "essay-valley",
+      "name": "Essay Valley",
+      "objective": "Build strong scholarship essays that clearly connect your experience, goals and chosen scholarship.",
+      "checkpoints": [
+        {
+          "id": "essay-foundation",
+          "title": "Find Your Story",
+          "description": "Identify the experiences that best demonstrate your motivation, leadership and impact.",
+          "tasks": [
+            {
+              "id": "essay-motivation",
+              "title": "Why this scholarship?",
+              "description": "Write why you want this scholarship and what you hope to achieve.",
+              "type": "writing",
+              "completed": false,
+              "input": {
+                "mode": "text_or_file",
+                "accepted_inputs": [
+                  "text",
+                  "file"
+                ],
+                "accepted_file_types": [
+                  "pdf",
+                  "doc",
+                  "docx",
+                  "txt"
+                ]
+              }
+            },
+            {
+              "id": "essay-university",
+              "title": "Why this university?",
+              "description": "Explain why the university and program are relevant to your goals.",
+              "type": "writing",
+              "completed": true,
+              "input": {
+                "mode": "text_or_file",
+                "accepted_inputs": [
+                  "text",
+                  "file"
+                ],
+                "accepted_file_types": [
+                  "pdf",
+                  "doc",
+                  "docx",
+                  "txt"
+                ]
+              },
+              "document": {
+                "filename": "essay test 1.pdf",
+                "storedFilename": "1786550203590-essay_test_1.pdf",
+                "documentType": "essay",
+                "uploadedAt": "2026-08-12T15:57:42.730Z"
+              }
+            }
+          ],
+          "progress": 50,
+          "completed": false
+        },
+        {
+          "id": "essay-star",
+          "title": "Write With Evidence",
+          "description": "Turn your experiences into specific and convincing stories.",
+          "tasks": [
+            {
+              "id": "essay-star-story",
+              "title": "Write using the STAR method",
+              "description": "Rewrite an important experience using Situation, Task, Action and Result.",
+              "type": "writing",
+              "completed": false,
+              "input": {
+                "mode": "text_or_file",
+                "accepted_inputs": [
+                  "text",
+                  "file"
+                ],
+                "accepted_file_types": [
+                  "pdf",
+                  "doc",
+                  "docx",
+                  "txt"
+                ]
+              }
+            },
+            {
+              "id": "essay-impact",
+              "title": "Add measurable impact",
+              "description": "Include concrete outcomes instead of only describing what you did.",
+              "type": "writing",
+              "completed": false,
+              "input": {
+                "mode": "text_or_file",
+                "accepted_inputs": [
+                  "text",
+                  "file"
+                ],
+                "accepted_file_types": [
+                  "pdf",
+                  "doc",
+                  "docx",
+                  "txt"
+                ]
+              }
+            }
+          ],
+          "progress": 0,
+          "completed": false
+        },
+        {
+          "id": "essay-review",
+          "title": "Improve Your Draft",
+          "description": "Review your essay for clarity, evidence and alignment with the scholarship.",
+          "tasks": [
+            {
+              "id": "essay-clarity",
+              "title": "Check your story flow",
+              "description": "Make sure the essay has a clear beginning, development and conclusion.",
+              "type": "review",
+              "completed": false,
+              "input": {
+                "mode": "text_or_file",
+                "accepted_inputs": [
+                  "text",
+                  "file"
+                ],
+                "accepted_file_types": [
+                  "pdf",
+                  "doc",
+                  "docx",
+                  "txt"
+                ]
+              }
+            },
+            {
+              "id": "essay-alignment",
+              "title": "Check scholarship alignment",
+              "description": "Make sure your experiences and goals directly answer the scholarship criteria.",
+              "type": "review",
+              "completed": false,
+              "input": {
+                "mode": "text_or_file",
+                "accepted_inputs": [
+                  "text",
+                  "file"
+                ],
+                "accepted_file_types": [
+                  "pdf",
+                  "doc",
+                  "docx",
+                  "txt"
+                ]
+              }
+            }
+          ],
+          "progress": 0,
+          "completed": false
+        }
+      ],
+      "order": 2,
+      "status": "locked",
+      "progress": 17,
+      "completed": false
+    },
+    {
+      "id": "application-valley",
+      "name": "Application Valley",
+      "objective": "Prepare and verify the final scholarship application before submission.",
+      "checkpoints": [
+        {
+          "id": "application-documents",
+          "title": "Prepare Your Documents",
+          "description": "Collect and organize all documents required by the scholarship.",
+          "tasks": [
+            {
+              "id": "application-cv",
+              "title": "Update your CV",
+              "description": "Make sure your CV reflects your strongest academic, professional and leadership achievements.",
+              "type": "document",
+              "completed": true,
+              "input": {
+                "mode": "file",
+                "accepted_inputs": [
+                  "file"
+                ],
+                "accepted_file_types": [
+                  "pdf",
+                  "doc",
+                  "docx",
+                  "txt",
+                  "jpg",
+                  "jpeg",
+                  "png"
+                ]
+              },
+              "upload": {
+                "filename": "Rifka KADA Fullstack version.pdf",
+                "storedFilename": "1786541614019-Rifka_KADA_Fullstack_version.pdf",
+                "documentType": "cv",
+                "uploadedAt": "2026-08-12T13:33:46.511Z"
+              }
+            },
+            {
+              "id": "application-transcript",
+              "title": "Prepare academic documents",
+              "description": "Collect transcripts, certificates and other academic records.",
+              "type": "document",
+              "completed": true,
+              "input": {
+                "mode": "file",
+                "accepted_inputs": [
+                  "file"
+                ],
+                "accepted_file_types": [
+                  "pdf",
+                  "doc",
+                  "docx",
+                  "txt",
+                  "jpg",
+                  "jpeg",
+                  "png"
+                ]
+              },
+              "upload": {
+                "filename": "Ijazah dan Transkrip Stefanie.pdf",
+                "storedFilename": "1786551141825-Ijazah_dan_Transkrip_Stefanie.pdf",
+                "documentType": "transcript",
+                "uploadedAt": "2026-08-12T16:12:47.720Z"
+              }
+            },
+            {
+              "id": "application-recommendation",
+              "title": "Prepare recommendation letters",
+              "description": "Identify referees and request recommendation letters early.",
+              "type": "document",
+              "completed": true,
+              "input": {
+                "mode": "file",
+                "accepted_inputs": [
+                  "file"
+                ],
+                "accepted_file_types": [
+                  "pdf",
+                  "doc",
+                  "docx",
+                  "txt",
+                  "jpg",
+                  "jpeg",
+                  "png"
+                ]
+              },
+              "upload": {
+                "filename": "Sample-Letters-of-Recommendation.pdf",
+                "storedFilename": "1786546604724-Sample-Letters-of-Recommendation.pdf",
+                "documentType": "recommendation",
+                "uploadedAt": "2026-08-12T14:56:53.100Z"
+              }
+            }
+          ],
+          "progress": 100,
+          "completed": true
+        },
+        {
+          "id": "application-final-review",
+          "title": "Final Application Check",
+          "description": "Review the complete application before submission.",
+          "tasks": [
+            {
+              "id": "application-requirements",
+              "title": "Check every requirement",
+              "description": "Compare your application against the scholarship requirements.",
+              "type": "review",
+              "completed": false,
+              "input": {
+                "mode": "text",
+                "accepted_inputs": [
+                  "text"
+                ],
+                "accepted_file_types": []
+              }
+            },
+            {
+              "id": "application-proofread",
+              "title": "Proofread everything",
+              "description": "Check spelling, formatting and consistency across all application materials.",
+              "type": "review",
+              "completed": false,
+              "input": {
+                "mode": "text",
+                "accepted_inputs": [
+                  "text"
+                ],
+                "accepted_file_types": []
+              }
+            },
+            {
+              "id": "application-submit",
+              "title": "Submit your application",
+              "description": "Submit the completed application before the deadline.",
+              "type": "submission",
+              "completed": false,
+              "input": {
+                "mode": "text",
+                "accepted_inputs": [
+                  "text"
+                ],
+                "accepted_file_types": []
+              }
+            }
+          ],
+          "progress": 0,
+          "completed": false
+        }
+      ],
+      "order": 3,
+      "status": "locked",
+      "progress": 50,
+      "completed": false
+    }
+  ],
+  "assessment": {
+    "assessment_number": 2,
+    "revised_percentage": 0
+  },
+  "timeline": {
+    "start_date": "2026-08-12",
+    "target_date": null,
+    "deadline": {
+      "deadline_source": "scholarship_data",
+      "deadline_precision": "unknown",
+      "application_period": null,
+      "application_start_date": null,
+      "deadline_date": null,
+      "estimated_deadline_date": null,
+      "current_cycle_status": "unknown",
+      "days_remaining": null,
+      "recommended_cycle": 2026,
+      "strategy": "conservative",
+      "requires_deadline_verification": true
+    },
+    "total_days": null,
+    "timeline_status": "needs_deadline_verification",
+    "valleys": [
+      {
+        "valley_id": "leadership-valley",
+        "status": "current",
+        "timeline_status": "scheduled",
+        "tasks": [
+          {
+            "id": "leadership-activities",
+            "title": "List your leadership experiences",
+            "description": "Write down organizations, projects, teams or initiatives you have led.",
+            "type": "evidence",
+            "completed": false,
+            "input": {
+              "mode": "text",
+              "accepted_inputs": [
+                "text"
+              ],
+              "accepted_file_types": []
+            },
+            "timeline": {
+              "start_date": "2026-08-12",
+              "target_date": "2026-08-18",
+              "status": "scheduled"
+            }
+          },
+          {
+            "id": "leadership-role",
+            "title": "Describe your role",
+            "description": "Explain what you were responsible for in each leadership experience.",
+            "type": "reflection",
+            "completed": false,
+            "input": {
+              "mode": "text",
+              "accepted_inputs": [
+                "text"
+              ],
+              "accepted_file_types": []
+            },
+            "timeline": {
+              "start_date": "2026-08-19",
+              "target_date": "2026-08-25",
+              "status": "scheduled"
+            }
+          },
+          {
+            "id": "leadership-impact",
+            "title": "Measure your impact",
+            "description": "Add measurable results such as people reached, money raised, projects completed or improvements achieved.",
+            "type": "evidence",
+            "completed": false,
+            "input": {
+              "mode": "text",
+              "accepted_inputs": [
+                "text"
+              ],
+              "accepted_file_types": []
+            },
+            "timeline": {
+              "start_date": "2026-08-26",
+              "target_date": "2026-09-01",
+              "status": "scheduled"
+            }
+          },
+          {
+            "id": "leadership-star",
+            "title": "Write one STAR story",
+            "description": "Describe one leadership experience using Situation, Task, Action and Result.",
+            "type": "writing",
+            "completed": false,
+            "input": {
+              "mode": "text_or_file",
+              "accepted_inputs": [
+                "text",
+                "file"
+              ],
+              "accepted_file_types": [
+                "pdf",
+                "doc",
+                "docx",
+                "txt"
+              ]
+            },
+            "timeline": {
+              "start_date": "2026-09-02",
+              "target_date": "2026-09-08",
+              "status": "scheduled"
+            }
+          },
+          {
+            "id": "leadership-lesson",
+            "title": "Explain what you learned",
+            "description": "Explain how the experience changed your leadership approach.",
+            "type": "reflection",
+            "completed": false,
+            "input": {
+              "mode": "text",
+              "accepted_inputs": [
+                "text"
+              ],
+              "accepted_file_types": []
+            },
+            "timeline": {
+              "start_date": "2026-09-09",
+              "target_date": "2026-09-15",
+              "status": "scheduled"
+            }
+          }
+        ]
+      },
+      {
+        "valley_id": "essay-valley",
+        "status": "locked",
+        "timeline_status": "locked",
+        "tasks": []
+      },
+      {
+        "valley_id": "application-valley",
+        "status": "locked",
+        "timeline_status": "locked",
+        "tasks": []
+      }
+    ]
+  }
+}

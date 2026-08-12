@@ -1,4 +1,5 @@
 const express = require("express");
+const multer = require("multer");
 
 const router = express.Router();
 
@@ -28,6 +29,62 @@ const {
     submitTaskAnswer
 } = require("../services/journeyTaskService");
 
+const {
+    extractTextFromFile
+} = require("../services/ocrService");
+
+const {
+    validateDocument
+} = require("../services/documentValidationService");
+
+
+/*
+=========================================================
+UPLOAD CONFIGURATION
+=========================================================
+*/
+
+const uploadStorage =
+    multer.diskStorage({
+
+        destination: (
+            req,
+            file,
+            cb
+        ) => {
+
+            cb(
+                null,
+                "uploads/"
+            );
+
+        },
+
+        filename: (
+            req,
+            file,
+            cb
+        ) => {
+
+            const filename =
+                Date.now() +
+                "-" +
+                file.originalname;
+
+            cb(
+                null,
+                filename
+            );
+
+        }
+
+    });
+
+
+const journeyUpload =
+    multer({
+        storage: uploadStorage
+    });
 
 
 /*
@@ -35,42 +92,8 @@ const {
 CREATE JOURNEY
 
 POST /api/journey
-
-Expected body:
-
-{
-    "studentId": "student-001",
-
-    "answers": {
-        ...
-    },
-
-    "uploads": {},
-
-    "scholarship": {
-        "id": "chevening-001",
-        "name": "Chevening Scholarship"
-    }
-}
-
-Flow:
-
-Assessment 2
-    ↓
-Deep Assessment Profile
-    ↓
-Readiness
-    ↓
-Journey Planner
-    ↓
-Valleys + Tasks
-    ↓
-Timeline
-    ↓
-Save Journey
 =========================================================
 */
-
 
 router.post(
     "/",
@@ -86,11 +109,10 @@ router.post(
             } = req.body;
 
 
-
             /*
-            -------------------------------------------------
-            Validate student ID
-            -------------------------------------------------
+            =============================================
+            1. VALIDATE STUDENT ID
+            =============================================
             */
 
             if (!studentId) {
@@ -107,18 +129,13 @@ router.post(
             }
 
 
-
             /*
-            -------------------------------------------------
-            Validate answers
-            -------------------------------------------------
+            =============================================
+            2. VALIDATE ANSWERS
+            =============================================
             */
 
-            if (
-                !answers ||
-                typeof answers !== "object" ||
-                Object.keys(answers).length === 0
-            ) {
+            if (!answers) {
 
                 return res.status(400).json({
 
@@ -132,11 +149,10 @@ router.post(
             }
 
 
-
             /*
-            -------------------------------------------------
-            Validate scholarship
-            -------------------------------------------------
+            =============================================
+            3. VALIDATE SCHOLARSHIP
+            =============================================
             */
 
             if (!scholarship) {
@@ -153,15 +169,10 @@ router.post(
             }
 
 
-
             /*
-            -------------------------------------------------
-            If this student already has a journey,
-            return the existing journey.
-
-            This prevents completed progress from
-            being destroyed by generating a new journey.
-            -------------------------------------------------
+            =============================================
+            4. CHECK EXISTING JOURNEY
+            =============================================
             */
 
             if (
@@ -174,7 +185,6 @@ router.post(
                     loadJourney(
                         studentId
                     );
-
 
                 return res.json({
 
@@ -193,28 +203,17 @@ router.post(
             }
 
 
-
             /*
-            =================================================
-            1. ANALYZE ASSESSMENT 2
-            =================================================
-
-            IMPORTANT:
-
-            analyzeDeepAssessment() is async.
-
-            Therefore we MUST use await here.
-
-            Without await:
-
-                deepAssessment = Promise
-
-            With await:
-
-                deepAssessment = actual result
-
-            =================================================
+            =============================================
+            5. RUN ASSESSMENT 2
+            =============================================
             */
+
+            console.log(
+                "Running Assessment 2 for journey:",
+                studentId
+            );
+
 
             const deepAssessment =
                 await analyzeDeepAssessment(
@@ -222,13 +221,6 @@ router.post(
                     uploads || {}
                 );
 
-
-
-            /*
-            -------------------------------------------------
-            Verify deep assessment result
-            -------------------------------------------------
-            */
 
             if (!deepAssessment) {
 
@@ -239,21 +231,23 @@ router.post(
             }
 
 
-
             /*
-            -------------------------------------------------
-            Get generated student profile
-            -------------------------------------------------
+            =============================================
+            6. GET PROFILE
+            =============================================
             */
 
             const profile =
                 deepAssessment.profile;
 
 
-            if (!profile) {
+            if (
+                !profile ||
+                !profile.student_profile
+            ) {
 
                 console.error(
-                    "Deep assessment result:",
+                    "Invalid Assessment 2 profile:",
                     JSON.stringify(
                         deepAssessment,
                         null,
@@ -262,22 +256,21 @@ router.post(
                 );
 
                 throw new Error(
-                    "Deep assessment did not return a student profile"
+                    "Deep assessment did not return a valid student profile"
                 );
 
             }
 
 
+            console.log(
+                "Student profile successfully generated."
+            );
+
 
             /*
-            =================================================
-            2. GET CALCULATED ASSESSMENT 2 READINESS
-            =================================================
-
-            Readiness comes directly from Assessment 2.
-
-            The frontend does NOT send readiness.
-            =================================================
+            =============================================
+            7. GET READINESS
+            =============================================
             */
 
             const calculatedReadiness =
@@ -301,23 +294,32 @@ router.post(
             }
 
 
+            console.log(
+                "Assessment 2 readiness:",
+                calculatedReadiness
+            );
+
 
             /*
-            -------------------------------------------------
-            Put calculated readiness into student profile.
-            -------------------------------------------------
+            =============================================
+            8. PUT READINESS INTO PROFILE
+            =============================================
             */
 
             profile.readiness =
                 calculatedReadiness;
 
 
-
             /*
-            =================================================
-            3. PLAN JOURNEY
-            =================================================
+            =============================================
+            9. PLAN JOURNEY
+            =============================================
             */
+
+            console.log(
+                "Planning journey..."
+            );
+
 
             const journeyPlan =
                 planJourney(
@@ -326,12 +328,16 @@ router.post(
                 );
 
 
-
             /*
-            =================================================
-            4. GENERATE VALLEYS + TASKS
-            =================================================
+            =============================================
+            10. GENERATE VALLEYS
+            =============================================
             */
+
+            console.log(
+                "Generating journey valleys..."
+            );
+
 
             let journey =
                 generateValleys(
@@ -341,44 +347,46 @@ router.post(
                 );
 
 
-
             /*
-            =================================================
-            5. EXPOSE ASSESSMENT 2 READINESS
-            =================================================
+            =============================================
+            11. ADD READINESS
+            =============================================
             */
 
             journey.readiness =
                 calculatedReadiness;
 
 
+            /*
+            =============================================
+            12. ADD ASSESSMENT
+            =============================================
+            */
+
             journey.assessment =
                 journey.assessment || {};
 
 
-            journey.assessment.assessment_number =
-                2;
+            journey.assessment
+                .assessment_number =
+                    2;
 
 
-            journey.assessment.revised_percentage =
-                calculatedReadiness;
-
+            journey.assessment
+                .revised_percentage =
+                    calculatedReadiness;
 
 
             /*
-            =================================================
-            6. PLAN TIMELINE
-            =================================================
-
-            Timeline planner uses:
-
-            - scholarship deadline
-            - current date
-            - valley order
-            - current/locked status
-            - task completion
-            =================================================
+            =============================================
+            13. PLAN TIMELINE
+            =============================================
             */
+
+            console.log(
+                "Planning timeline..."
+            );
+
 
             journey =
                 planTimeline(
@@ -386,12 +394,10 @@ router.post(
                 );
 
 
-
             /*
-            -------------------------------------------------
-            Make sure readiness/assessment data survives
-            timeline planning.
-            -------------------------------------------------
+            =============================================
+            14. MAKE SURE READINESS SURVIVES
+            =============================================
             */
 
             journey.readiness =
@@ -402,20 +408,27 @@ router.post(
                 journey.assessment || {};
 
 
-            journey.assessment.assessment_number =
-                2;
+            journey.assessment
+                .assessment_number =
+                    2;
 
 
-            journey.assessment.revised_percentage =
-                calculatedReadiness;
-
+            journey.assessment
+                .revised_percentage =
+                    calculatedReadiness;
 
 
             /*
-            =================================================
-            7. SAVE COMPLETE JOURNEY
-            =================================================
+            =============================================
+            15. SAVE
+            =============================================
             */
+
+            console.log(
+                "Saving journey:",
+                studentId
+            );
+
 
             saveJourney(
                 studentId,
@@ -423,11 +436,10 @@ router.post(
             );
 
 
-
             /*
-            =================================================
-            8. RETURN COMPLETE JOURNEY
-            =================================================
+            =============================================
+            16. RETURN
+            =============================================
             */
 
             return res.status(201).json({
@@ -469,17 +481,13 @@ router.post(
 );
 
 
-
 /*
 =========================================================
 GET JOURNEY
 
 GET /api/journey/:studentId
-
-Loads the student's saved journey.
 =========================================================
 */
-
 
 router.get(
     "/:studentId",
@@ -560,23 +568,13 @@ router.get(
 );
 
 
-
 /*
 =========================================================
-SUBMIT TASK ANSWER
+SUBMIT TEXT TASK ANSWER
 
 POST /api/journey/task/evaluate
-
-Expected body:
-
-{
-    "studentId": "student-001",
-    "taskId": "research-collect",
-    "answer": "..."
-}
 =========================================================
 */
-
 
 router.post(
     "/task/evaluate",
@@ -591,11 +589,10 @@ router.post(
             } = req.body;
 
 
-
             /*
-            -------------------------------------------------
-            Validate student ID
-            -------------------------------------------------
+            =============================================
+            VALIDATION
+            =============================================
             */
 
             if (!studentId) {
@@ -612,13 +609,6 @@ router.post(
             }
 
 
-
-            /*
-            -------------------------------------------------
-            Validate task ID
-            -------------------------------------------------
-            */
-
             if (!taskId) {
 
                 return res.status(400).json({
@@ -632,13 +622,6 @@ router.post(
 
             }
 
-
-
-            /*
-            -------------------------------------------------
-            Validate answer
-            -------------------------------------------------
-            */
 
             if (
                 !answer ||
@@ -657,11 +640,10 @@ router.post(
             }
 
 
-
             /*
-            -------------------------------------------------
-            Load THIS student's journey
-            -------------------------------------------------
+            =============================================
+            LOAD JOURNEY
+            =============================================
             */
 
             const journey =
@@ -684,11 +666,10 @@ router.post(
             }
 
 
-
             /*
-            -------------------------------------------------
-            Evaluate answer against student's journey
-            -------------------------------------------------
+            =============================================
+            EVALUATE
+            =============================================
             */
 
             const result =
@@ -707,11 +688,10 @@ router.post(
                 });
 
 
-
             /*
-            -------------------------------------------------
-            Save updated journey
-            -------------------------------------------------
+            =============================================
+            SAVE
+            =============================================
             */
 
             saveJourney(
@@ -720,11 +700,10 @@ router.post(
             );
 
 
-
             /*
-            -------------------------------------------------
-            Return evaluation + updated task + journey
-            -------------------------------------------------
+            =============================================
+            RETURN
+            =============================================
             */
 
             return res.json({
@@ -768,5 +747,452 @@ router.post(
 );
 
 
+/*
+=========================================================
+UPLOAD + OCR + DOCUMENT CHECK + EVALUATION
+
+POST /api/journey/task/evaluate-upload
+
+multipart/form-data
+
+studentId
+taskId
+file
+=========================================================
+*/
+
+router.post(
+    "/task/evaluate-upload",
+    journeyUpload.single("file"),
+    async (req, res) => {
+
+        try {
+
+            const {
+                studentId,
+                taskId
+            } = req.body;
+
+
+            /*
+            =============================================
+            1. VALIDATE STUDENT ID
+            =============================================
+            */
+
+            if (!studentId) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    error:
+                        "studentId is required"
+
+                });
+
+            }
+
+
+            /*
+            =============================================
+            2. VALIDATE TASK ID
+            =============================================
+            */
+
+            if (!taskId) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    error:
+                        "taskId is required"
+
+                });
+
+            }
+
+
+            /*
+            =============================================
+            3. VALIDATE FILE
+            =============================================
+            */
+
+            if (!req.file) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    error:
+                        "file is required"
+
+                });
+
+            }
+
+
+            console.log(
+                "Uploaded file:",
+                req.file.originalname
+            );
+
+
+            /*
+            =============================================
+            4. LOAD JOURNEY
+            =============================================
+            */
+
+            const journey =
+                loadJourney(
+                    studentId
+                );
+
+
+            if (!journey) {
+
+                return res.status(404).json({
+
+                    success: false,
+
+                    error:
+                        "Journey not found"
+
+                });
+
+            }
+
+
+            /*
+            =============================================
+            5. FIND TASK
+            =============================================
+            */
+
+            const task =
+                findTask(
+                    journey,
+                    taskId
+                );
+
+
+            if (!task) {
+
+                return res.status(404).json({
+
+                    success: false,
+
+                    error:
+                        `Task not found: ${taskId}`
+
+                });
+
+            }
+
+
+            console.log(
+                "Upload task:",
+                task.title
+            );
+
+
+            /*
+            =============================================
+            6. OCR
+            =============================================
+            */
+
+            console.log(
+                "Starting OCR..."
+            );
+
+
+            const extractedText =
+                await extractTextFromFile(
+                    req.file
+                );
+
+
+            if (
+                !extractedText ||
+                !extractedText.trim()
+            ) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    status:
+                        "needs_improvement",
+
+                    message:
+                        "We could not read the uploaded document. Please upload a clearer file."
+
+                });
+
+            }
+
+
+            console.log(
+                "OCR completed."
+            );
+
+
+            /*
+            =============================================
+            7. DOCUMENT TYPE CHECK
+            =============================================
+            */
+
+            let documentCheck = null;
+
+
+            /*
+            Only perform document checking
+            when the task actually expects
+            a specific document.
+            */
+
+            if (
+                task.expected_document_type
+            ) {
+
+                console.log(
+                    "Checking document type..."
+                );
+
+
+                documentCheck =
+                    await validateDocument({
+
+                        task,
+
+                        extractedText
+
+                    });
+
+
+                console.log(
+                    "Document check:",
+                    documentCheck
+                );
+
+
+                /*
+                =========================================
+                WRONG DOCUMENT
+                =========================================
+                */
+
+                if (
+                    documentCheck.valid !== true
+                ) {
+
+                    return res.json({
+
+                        success: true,
+
+                        status:
+                            "wrong_document",
+
+                        document: {
+
+                            valid: false,
+
+                            uploaded_type:
+                                documentCheck.document_type,
+
+                            expected_type:
+                                task.expected_document_type,
+
+                            confidence:
+                                documentCheck.confidence
+
+                        },
+
+                        warning:
+                            `This task requires a ${task.expected_document_type}, but the uploaded document appears to be a ${documentCheck.document_type}. Please upload the correct document.`,
+
+                        task: {
+
+                            id:
+                                task.id,
+
+                            completed:
+                                task.completed
+
+                        }
+
+                    });
+
+                }
+
+            }
+
+
+            /*
+            =============================================
+            8. CORRECT DOCUMENT
+            =============================================
+            */
+
+            console.log(
+                "Document accepted."
+            );
+
+
+            /*
+            OCR text becomes the answer.
+            We reuse the EXISTING task
+            evaluation system.
+            */
+
+            const result =
+                await submitTaskAnswer({
+
+                    journey,
+
+                    taskId,
+
+                    studentAnswer:
+                        extractedText,
+
+                    scholarship:
+                        journey.scholarship
+
+                });
+
+
+            /*
+            =============================================
+            9. SAVE UPDATED JOURNEY
+            =============================================
+            */
+
+            saveJourney(
+                studentId,
+                result.journey
+            );
+
+
+            /*
+            =============================================
+            10. RETURN RESULT
+            =============================================
+            */
+
+            return res.json({
+
+                success: true,
+
+                status:
+                    result.evaluation.status,
+
+                document: {
+
+                    valid: true,
+
+                    type:
+                        documentCheck
+                            ? documentCheck.document_type
+                            : "document",
+
+                    confidence:
+                        documentCheck
+                            ? documentCheck.confidence
+                            : null
+
+                },
+
+                evaluation:
+                    result.evaluation,
+
+                task:
+                    result.task,
+
+                journey:
+                    result.journey
+
+            });
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Journey upload evaluation error:",
+                error
+            );
+
+
+            return res.status(500).json({
+
+                success: false,
+
+                error:
+                    error.message ||
+                    "Failed to process uploaded document"
+
+            });
+
+        }
+
+    }
+);
+
+
+/*
+=========================================================
+FIND TASK HELPER
+=========================================================
+*/
+
+function findTask(
+    journey,
+    taskId
+) {
+
+    for (
+        const valley
+        of journey.valleys || []
+    ) {
+
+        for (
+            const checkpoint
+            of valley.checkpoints || []
+        ) {
+
+            for (
+                const task
+                of checkpoint.tasks || []
+            ) {
+
+                if (
+                    task.id === taskId
+                ) {
+
+                    return task;
+
+                }
+
+            }
+
+        }
+
+    }
+
+
+    return null;
+}
+
+
+/*
+=========================================================
+EXPORT
+=========================================================
+*/
 
 module.exports = router;

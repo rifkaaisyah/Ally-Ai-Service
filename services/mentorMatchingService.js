@@ -2,9 +2,10 @@
  * Simple rule-based mentor matching.
  *
  * V1 matching criteria:
+ * - scholarship
  * - study field
  * - career area
- * - scholarship/country experience
+ * - country experience
  * - leadership experience
  *
  * Returns the highest-scoring mentor.
@@ -30,6 +31,7 @@ function matchMentor(profile, mentors = []) {
     const studentStudyField =
         String(
             student.academic?.study_direction ||
+            student.academic?.study_field ||
             student.study_field ||
             ""
         ).toLowerCase();
@@ -51,6 +53,16 @@ function matchMentor(profile, mentors = []) {
             student.leadership?.experience
         ) &&
         student.leadership.experience.length > 0;
+
+    // Scholarship can come from different parts
+    // of the current assessment response.
+    const studentScholarship =
+        String(
+            profile.scholarship?.name ||
+            profile.beasiswa_recomendation?.metadata?.name ||
+            profile.data?.beasiswa_recomendation?.metadata?.name ||
+            "LPDP Scholarship"
+        ).toLowerCase();
 
 
     const scoredMentors =
@@ -74,11 +86,41 @@ function matchMentor(profile, mentors = []) {
                         ? mentor.countries
                         : [];
 
+                const mentorScholarships =
+                    Array.isArray(mentor.scholarships)
+                        ? mentor.scholarships
+                        : [];
+
+
+                // -----------------------------------------
+                // Scholarship
+                // -----------------------------------------
+
+                if (
+                    studentScholarship &&
+                    mentorScholarships.some(
+                        scholarship =>
+                            String(scholarship)
+                                .toLowerCase()
+                                .includes(studentScholarship) ||
+                            studentScholarship.includes(
+                                String(scholarship)
+                                    .toLowerCase()
+                            )
+                    )
+                ) {
+
+                    score += 5;
+
+                }
+
+
                 // -----------------------------------------
                 // Study field
                 // -----------------------------------------
 
                 if (
+                    studentStudyField &&
                     mentorFields.some(
                         field =>
                             String(field)
@@ -103,6 +145,7 @@ function matchMentor(profile, mentors = []) {
                 // -----------------------------------------
 
                 if (
+                    studentCareerArea &&
                     mentorCareerAreas.some(
                         area =>
                             String(area)
@@ -175,7 +218,6 @@ function matchMentor(profile, mentors = []) {
 
 
     return scoredMentors[0];
-
 }
 
 
@@ -215,7 +257,9 @@ function rankMentors(
                 const careerAreas =
                     mentor.career_areas || [];
 
+
                 if (
+                    studyField &&
                     fields.some(
                         field =>
                             String(field)
@@ -232,7 +276,9 @@ function rankMentors(
 
                 }
 
+
                 if (
+                    careerArea &&
                     careerAreas.some(
                         area =>
                             String(area)
@@ -249,6 +295,7 @@ function rankMentors(
 
                 }
 
+
                 if (
                     mentor.leadership_experience
                 ) {
@@ -257,6 +304,7 @@ function rankMentors(
 
                 }
 
+
                 return {
                     ...mentor,
                     matchScore: score
@@ -264,6 +312,7 @@ function rankMentors(
 
             }
         );
+
 
     return ranked.sort(
         (a, b) =>

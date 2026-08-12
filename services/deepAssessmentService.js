@@ -7,169 +7,310 @@ const {
 } = require("../RAG/ragService");
 
 
+/*
+=========================================================
+CALCULATE REVISED READINESS
+=========================================================
+
+Assessment 2 readiness is calculated from the
+student's deep profile.
+
+Maximum = 100
+=========================================================
+*/
 
 function calculateRevisedReadiness(profile) {
 
     let score = 0;
 
-    const student = profile.student_profile;
+
+    /*
+    -----------------------------------------------------
+    Validate profile
+    -----------------------------------------------------
+    */
+
+    if (
+        !profile ||
+        !profile.student_profile
+    ) {
+
+        throw new Error(
+            "Student profile is required for readiness calculation"
+        );
+
+    }
+
+
+    const student =
+        profile.student_profile;
 
 
     /*
-    Academic Strength
+    =====================================================
+    ACADEMIC STRENGTH
     Maximum: 25
+    =====================================================
     */
 
-    if (student.academic.master_motivation) {
+    if (
+        student.academic?.master_motivation
+    ) {
+
         score += 5;
+
     }
 
 
     if (
-        student.academic.study_plan_clarity === "Very Clear" ||
-        student.academic.study_plan_clarity === "exact_program_university"
+        student.academic?.study_plan_clarity ===
+            "Very Clear" ||
+
+        student.academic?.study_plan_clarity ===
+            "exact_program_university"
     ) {
+
         score += 10;
+
     }
-    else if (student.academic.study_plan_clarity) {
+
+    else if (
+        student.academic?.study_plan_clarity
+    ) {
+
         score += 5;
+
     }
 
 
     if (
-        student.academic.academic_experiences &&
-        student.academic.academic_experiences.length > 0
-    ) {
-        score += 10;
-    }
+        Array.isArray(
+            student.academic?.academic_experiences
+        ) &&
 
+        student.academic
+            .academic_experiences
+            .length > 0
+    ) {
+
+        score += 10;
+
+    }
 
 
     /*
-    Research / Project Evidence
+    =====================================================
+    RESEARCH / PROJECT EVIDENCE
     Maximum: 15
+    =====================================================
     */
 
-    if (student.academic.academic_achievement) {
+    if (
+        student.academic?.academic_achievement
+    ) {
+
         score += 5;
+
     }
 
 
-    if (student.academic.field_project_experience) {
+    if (
+        student.academic?.field_project_experience
+    ) {
+
+        const projectExperience =
+            String(
+                student.academic
+                    .field_project_experience
+            )
+            .toLowerCase();
+
 
         if (
-            student.academic.field_project_experience.includes("multiple")
+            projectExperience.includes(
+                "multiple"
+            )
         ) {
+
             score += 10;
+
         }
+
         else {
+
             score += 7;
+
         }
 
     }
 
 
-
     /*
-    Leadership and Impact
+    =====================================================
+    LEADERSHIP AND IMPACT
     Maximum: 15
+    =====================================================
     */
 
     if (
-        student.leadership.experience &&
-        student.leadership.experience.length > 0
+        Array.isArray(
+            student.leadership?.experience
+        ) &&
+
+        student.leadership
+            .experience
+            .length > 0
     ) {
+
         score += 8;
+
     }
 
 
-    if (student.leadership.impact) {
+    if (
+        student.leadership?.impact
+    ) {
+
         score += 7;
-    }
 
+    }
 
 
     /*
-    Career Direction
+    =====================================================
+    CAREER DIRECTION
     Maximum: 15
+    =====================================================
     */
 
-    if (student.career.goal) {
+    if (
+        student.career?.goal
+    ) {
+
         score += 10;
+
     }
 
 
-    if (student.career.contribution_area) {
+    if (
+        student.career?.contribution_area
+    ) {
+
         score += 5;
-    }
 
+    }
 
 
     /*
-    Application Readiness
+    =====================================================
+    APPLICATION READINESS
     Maximum: 20
+    =====================================================
     */
 
     switch (
-        student.application_readiness.cv_strength
+        student.application_readiness
+            ?.cv_strength
     ) {
 
         case "achievement_based":
+
             score += 8;
+
             break;
+
 
         case "good_needs_improvement":
+
         case "Good":
+
             score += 5;
+
             break;
 
+
         case "basic":
+
             score += 3;
+
             break;
 
     }
-
 
 
     switch (
-        student.application_readiness.essay_readiness
+        student.application_readiness
+            ?.essay_readiness
     ) {
 
         case "clear_story":
+
         case "Draft Ready":
+
             score += 7;
+
             break;
 
+
         case "needs_structure":
+
             score += 4;
+
             break;
 
     }
-
 
 
     if (
-        student.application_readiness.recommendation_status
+        student.application_readiness
+            ?.recommendation_status
     ) {
+
         score += 5;
+
     }
 
 
-    return Math.min(score, 100);
+    /*
+    -----------------------------------------------------
+    Return maximum 100
+    -----------------------------------------------------
+    */
+
+    return Math.min(
+        score,
+        100
+    );
+
 }
 
 
+/*
+=========================================================
+GENERATE DEEP ASSESSMENT SUGGESTION
+=========================================================
+*/
 
 function generateSuggestion(profile) {
 
-    const student = profile.student_profile;
+    const student =
+        profile.student_profile;
 
 
     const strengths = [];
+
     const improvements = [];
 
 
-    if (student.career.goal) {
+    /*
+    -----------------------------------------------------
+    Strengths
+    -----------------------------------------------------
+    */
+
+    if (
+        student.career?.goal
+    ) {
 
         strengths.push(
             "you have a clear career direction"
@@ -178,9 +319,15 @@ function generateSuggestion(profile) {
     }
 
 
-
     if (
-        student.academic.academic_experiences.length > 0
+        Array.isArray(
+            student.academic
+                ?.academic_experiences
+        ) &&
+
+        student.academic
+            .academic_experiences
+            .length > 0
     ) {
 
         strengths.push(
@@ -190,9 +337,14 @@ function generateSuggestion(profile) {
     }
 
 
-
     if (
-        student.leadership.experience.length > 0
+        Array.isArray(
+            student.leadership?.experience
+        ) &&
+
+        student.leadership
+            .experience
+            .length > 0
     ) {
 
         strengths.push(
@@ -202,9 +354,15 @@ function generateSuggestion(profile) {
     }
 
 
+    /*
+    -----------------------------------------------------
+    Improvements
+    -----------------------------------------------------
+    */
 
     if (
-        !student.academic.field_project_experience
+        !student.academic
+            ?.field_project_experience
     ) {
 
         improvements.push(
@@ -214,9 +372,9 @@ function generateSuggestion(profile) {
     }
 
 
-
     if (
-        !student.application_readiness.recommendation_status
+        !student.application_readiness
+            ?.recommendation_status
     ) {
 
         improvements.push(
@@ -226,9 +384,9 @@ function generateSuggestion(profile) {
     }
 
 
-
     if (
-        !student.application_readiness.essay_readiness
+        !student.application_readiness
+            ?.essay_readiness
     ) {
 
         improvements.push(
@@ -238,28 +396,16 @@ function generateSuggestion(profile) {
     }
 
 
-
-    let suggestion =
-        "Based on your deep assessment, ";
-
-
-
-    if (strengths.length) {
-
-        suggestion +=
-            strengths.join(", ") + ". ";
-
-    }
-
-
-
     /*
-    Advanced improvement suggestions
+    -----------------------------------------------------
+    Academic/project evidence
+    -----------------------------------------------------
     */
 
     if (
-        student.academic.evidence.academic === null &&
-        student.academic.evidence.projects === null
+        student.academic?.evidence?.academic === null &&
+
+        student.academic?.evidence?.projects === null
     ) {
 
         improvements.push(
@@ -269,10 +415,18 @@ function generateSuggestion(profile) {
     }
 
 
+    /*
+    -----------------------------------------------------
+    Leadership impact
+    -----------------------------------------------------
+    */
 
     if (
-        student.leadership.impact &&
-        !student.leadership.impact.match(/\d+/)
+        student.leadership?.impact &&
+
+        !String(
+            student.leadership.impact
+        ).match(/\d+/)
     ) {
 
         improvements.push(
@@ -282,9 +436,15 @@ function generateSuggestion(profile) {
     }
 
 
+    /*
+    -----------------------------------------------------
+    CV improvement
+    -----------------------------------------------------
+    */
 
     if (
-        student.application_readiness.cv_strength === "Good"
+        student.application_readiness
+            ?.cv_strength === "Good"
     ) {
 
         improvements.push(
@@ -294,15 +454,40 @@ function generateSuggestion(profile) {
     }
 
 
+    /*
+    -----------------------------------------------------
+    Build suggestion
+    -----------------------------------------------------
+    */
 
-    if (improvements.length) {
+    let suggestion =
+        "Based on your deep assessment, ";
+
+
+    if (
+        strengths.length > 0
+    ) {
+
+        suggestion +=
+            strengths.join(", ") +
+            ". ";
+
+    }
+
+
+    if (
+        improvements.length > 0
+    ) {
 
         suggestion +=
             "To improve your scholarship readiness, " +
+
             improvements.join(", ") +
+
             ".";
 
     }
+
     else {
 
         suggestion +=
@@ -311,11 +496,16 @@ function generateSuggestion(profile) {
     }
 
 
-
     return suggestion;
+
 }
 
 
+/*
+=========================================================
+ANALYZE DEEP ASSESSMENT
+=========================================================
+*/
 
 async function analyzeDeepAssessment(
     answers,
@@ -323,7 +513,24 @@ async function analyzeDeepAssessment(
 ) {
 
     /*
-    Build the student's deep assessment profile
+    -----------------------------------------------------
+    Validate answers
+    -----------------------------------------------------
+    */
+
+    if (!answers) {
+
+        throw new Error(
+            "Assessment answers are required"
+        );
+
+    }
+
+
+    /*
+    =====================================================
+    1. BUILD STUDENT PROFILE
+    =====================================================
     */
 
     const profile =
@@ -333,9 +540,22 @@ async function analyzeDeepAssessment(
         );
 
 
+    if (
+        !profile ||
+        !profile.student_profile
+    ) {
+
+        throw new Error(
+            "Failed to build student profile"
+        );
+
+    }
+
 
     /*
-    Calculate individual scholarship readiness
+    =====================================================
+    2. CALCULATE REVISED READINESS
+    =====================================================
     */
 
     const revised_percentage =
@@ -344,9 +564,10 @@ async function analyzeDeepAssessment(
         );
 
 
-
     /*
-    Generate individual readiness suggestion
+    =====================================================
+    3. GENERATE SUGGESTION
+    =====================================================
     */
 
     const suggestion =
@@ -355,15 +576,10 @@ async function analyzeDeepAssessment(
         );
 
 
-
     /*
-    Get the scholarship recommendation
-    from the existing RAG system.
-
-    The RAG already returns ONE recommendation
-    under the key:
-
-        beasiswa_recomendation
+    =====================================================
+    4. GET SCHOLARSHIP RECOMMENDATION
+    =====================================================
     */
 
     const scholarshipResult =
@@ -372,16 +588,23 @@ async function analyzeDeepAssessment(
         );
 
 
-
     /*
-    Keep the exact recommendation returned
-    by the RAG system.
+    =====================================================
+    5. EXTRACT RECOMMENDATION
+    =====================================================
     */
 
     const beasiswa_recomendation =
-        scholarshipResult?.beasiswa_recomendation || null;
+        scholarshipResult
+            ?.beasiswa_recomendation ||
+        null;
 
 
+    /*
+    =====================================================
+    6. RETURN COMPLETE RESULT
+    =====================================================
+    */
 
     return {
 
@@ -395,16 +618,19 @@ async function analyzeDeepAssessment(
 
         },
 
-
         profile
 
     };
-}
 
+}
 
 
 module.exports = {
 
-    analyzeDeepAssessment
+    analyzeDeepAssessment,
+
+    calculateRevisedReadiness,
+
+    generateSuggestion
 
 };
