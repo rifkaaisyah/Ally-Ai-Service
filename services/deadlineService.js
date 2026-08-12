@@ -13,210 +13,534 @@ const MONTHS = {
     december: 11
 };
 
-function parseDeadline(applicationPeriod, today = new Date()) {
+
+/**
+ * Parse a scholarship application period/deadline.
+ *
+ * Supported formats:
+ *
+ * 1. "2026-10-31"
+ * 2. "31 July 2026"
+ * 3. "30 June - 31 July 2026"
+ * 4. "February-April 2027"
+ * 5. "Usually February-April"
+ * 6. "May 2027"
+ */
+function parseDeadline(
+    applicationPeriod,
+    today = new Date()
+) {
+
     const raw =
         typeof applicationPeriod === "string"
             ? applicationPeriod.trim()
             : "";
 
+
     if (!raw) {
-        return buildUnknownDeadline(raw, today);
+
+        return buildUnknownDeadline(
+            raw,
+            today
+        );
+
     }
 
-    // Example: "30 June - 31 July 2026"
-    const exactRange = raw.match(
-        /(\d{1,2})\s+([A-Za-z]+)\s*-\s*(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})/i
-    );
 
-    if (exactRange) {
-        const startDay = Number(exactRange[1]);
-        const startMonth = parseMonth(exactRange[2]);
+    /*
+     * --------------------------------------------------
+     * 1. ISO DATE
+     *
+     * This is the format currently returned by the
+     * real scholarship/journey API:
+     *
+     * "2026-10-31"
+     * --------------------------------------------------
+     */
 
-        const endDay = Number(exactRange[3]);
-        const endMonth = parseMonth(exactRange[4]);
+    const isoDate =
+        raw.match(
+            /^(\d{4})-(\d{2})-(\d{2})$/
+        );
 
-        const year = Number(exactRange[5]);
 
-        if (
-            startMonth !== null &&
-            endMonth !== null
-        ) {
-            const startDate = createDate(
-                year,
-                startMonth,
-                startDay
+    if (isoDate) {
+
+        const year =
+            Number(
+                isoDate[1]
             );
 
-            const deadlineDate = createDate(
-                year,
-                endMonth,
-                endDay
+        const month =
+            Number(
+                isoDate[2]
+            ) - 1;
+
+        const day =
+            Number(
+                isoDate[3]
             );
 
-            return normalizeDeadline({
-                source: raw,
-                deadlinePrecision: "exact",
-                applicationStartDate: startDate,
-                deadlineDate,
-                today
-            });
-        }
-    }
 
-    // Example: "31 July 2026"
-    const exactDate = raw.match(
-        /(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})/i
-    );
-
-    if (exactDate) {
-        const day = Number(exactDate[1]);
-        const month = parseMonth(exactDate[2]);
-        const year = Number(exactDate[3]);
-
-        if (month !== null) {
-            const deadlineDate = createDate(
+        const deadlineDate =
+            createDate(
                 year,
                 month,
                 day
             );
 
-            return normalizeDeadline({
-                source: raw,
-                deadlinePrecision: "exact",
-                applicationStartDate: null,
-                deadlineDate,
-                today
-            });
-        }
-    }
 
-    // Example: "February-April 2027"
-    const monthRangeWithYear = raw.match(
-        /([A-Za-z]+)\s*-\s*([A-Za-z]+)\s+(\d{4})/i
-    );
-
-    if (monthRangeWithYear) {
-        const startMonth = parseMonth(
-            monthRangeWithYear[1]
-        );
-
-        const endMonth = parseMonth(
-            monthRangeWithYear[2]
-        );
-
-        const year = Number(
-            monthRangeWithYear[3]
-        );
+        /*
+         * Validate the date.
+         *
+         * JavaScript automatically normalizes invalid
+         * dates such as 2026-02-31, so we explicitly
+         * verify that the resulting date still matches
+         * the original values.
+         */
 
         if (
-            startMonth !== null &&
-            endMonth !== null
+            deadlineDate.getFullYear() === year &&
+            deadlineDate.getMonth() === month &&
+            deadlineDate.getDate() === day
         ) {
-            const estimatedDeadline = createDate(
-                year,
-                endMonth,
-                getLastDayOfMonth(
-                    year,
-                    endMonth
-                )
+
+            return normalizeDeadline({
+
+                source:
+                    raw,
+
+                deadlinePrecision:
+                    "exact",
+
+                applicationStartDate:
+                    null,
+
+                deadlineDate,
+
+                today
+
+            });
+
+        }
+
+    }
+
+
+    /*
+     * --------------------------------------------------
+     * 2. EXACT DATE RANGE
+     *
+     * Example:
+     *
+     * "30 June - 31 July 2026"
+     * --------------------------------------------------
+     */
+
+    const exactRange =
+        raw.match(
+            /(\d{1,2})\s+([A-Za-z]+)\s*-\s*(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})/i
+        );
+
+
+    if (exactRange) {
+
+        const startDay =
+            Number(
+                exactRange[1]
             );
 
-            return buildEstimatedDeadline({
-                source: raw,
-                applicationStartMonth: startMonth,
-                applicationEndMonth: endMonth,
-                deadlineDate: estimatedDeadline,
-                today,
-                year
-            });
-        }
-    }
+        const startMonth =
+            parseMonth(
+                exactRange[2]
+            );
 
-    // Example: "Usually February-April"
-    const monthRange = raw.match(
-        /([A-Za-z]+)\s*-\s*([A-Za-z]+)/i
-    );
 
-    if (monthRange) {
-        const startMonth = parseMonth(
-            monthRange[1]
-        );
+        const endDay =
+            Number(
+                exactRange[3]
+            );
 
-        const endMonth = parseMonth(
-            monthRange[2]
-        );
+        const endMonth =
+            parseMonth(
+                exactRange[4]
+            );
+
+
+        const year =
+            Number(
+                exactRange[5]
+            );
+
 
         if (
             startMonth !== null &&
             endMonth !== null
         ) {
+
+            const startDate =
+                createDate(
+                    year,
+                    startMonth,
+                    startDay
+                );
+
+
+            const deadlineDate =
+                createDate(
+                    year,
+                    endMonth,
+                    endDay
+                );
+
+
+            return normalizeDeadline({
+
+                source:
+                    raw,
+
+                deadlinePrecision:
+                    "exact",
+
+                applicationStartDate:
+                    startDate,
+
+                deadlineDate,
+
+                today
+
+            });
+
+        }
+
+    }
+
+
+    /*
+     * --------------------------------------------------
+     * 3. EXACT SINGLE DATE
+     *
+     * Example:
+     *
+     * "31 July 2026"
+     * --------------------------------------------------
+     */
+
+    const exactDate =
+        raw.match(
+            /(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})/i
+        );
+
+
+    if (exactDate) {
+
+        const day =
+            Number(
+                exactDate[1]
+            );
+
+
+        const month =
+            parseMonth(
+                exactDate[2]
+            );
+
+
+        const year =
+            Number(
+                exactDate[3]
+            );
+
+
+        if (
+            month !== null
+        ) {
+
+            const deadlineDate =
+                createDate(
+                    year,
+                    month,
+                    day
+                );
+
+
+            return normalizeDeadline({
+
+                source:
+                    raw,
+
+                deadlinePrecision:
+                    "exact",
+
+                applicationStartDate:
+                    null,
+
+                deadlineDate,
+
+                today
+
+            });
+
+        }
+
+    }
+
+
+    /*
+     * --------------------------------------------------
+     * 4. MONTH RANGE WITH YEAR
+     *
+     * Example:
+     *
+     * "February-April 2027"
+     * --------------------------------------------------
+     */
+
+    const monthRangeWithYear =
+        raw.match(
+            /([A-Za-z]+)\s*-\s*([A-Za-z]+)\s+(\d{4})/i
+        );
+
+
+    if (monthRangeWithYear) {
+
+        const startMonth =
+            parseMonth(
+                monthRangeWithYear[1]
+            );
+
+
+        const endMonth =
+            parseMonth(
+                monthRangeWithYear[2]
+            );
+
+
+        const year =
+            Number(
+                monthRangeWithYear[3]
+            );
+
+
+        if (
+            startMonth !== null &&
+            endMonth !== null
+        ) {
+
+            const estimatedDeadline =
+                createDate(
+
+                    year,
+
+                    endMonth,
+
+                    getLastDayOfMonth(
+                        year,
+                        endMonth
+                    )
+
+                );
+
+
+            return buildEstimatedDeadline({
+
+                source:
+                    raw,
+
+                applicationStartMonth:
+                    startMonth,
+
+                applicationEndMonth:
+                    endMonth,
+
+                deadlineDate:
+                    estimatedDeadline,
+
+                today,
+
+                year
+
+            });
+
+        }
+
+    }
+
+
+    /*
+     * --------------------------------------------------
+     * 5. MONTH RANGE WITHOUT YEAR
+     *
+     * Example:
+     *
+     * "Usually February-April"
+     * --------------------------------------------------
+     */
+
+    const monthRange =
+        raw.match(
+            /([A-Za-z]+)\s*-\s*([A-Za-z]+)/i
+        );
+
+
+    if (monthRange) {
+
+        const startMonth =
+            parseMonth(
+                monthRange[1]
+            );
+
+
+        const endMonth =
+            parseMonth(
+                monthRange[2]
+            );
+
+
+        if (
+            startMonth !== null &&
+            endMonth !== null
+        ) {
+
             const estimatedYear =
                 inferUpcomingYear(
                     endMonth,
                     today
                 );
 
-            const estimatedDeadline = createDate(
-                estimatedYear,
-                endMonth,
-                getLastDayOfMonth(
+
+            const estimatedDeadline =
+                createDate(
+
                     estimatedYear,
-                    endMonth
-                )
-            );
+
+                    endMonth,
+
+                    getLastDayOfMonth(
+                        estimatedYear,
+                        endMonth
+                    )
+
+                );
+
 
             return buildEstimatedDeadline({
-                source: raw,
-                applicationStartMonth: startMonth,
-                applicationEndMonth: endMonth,
-                deadlineDate: estimatedDeadline,
+
+                source:
+                    raw,
+
+                applicationStartMonth:
+                    startMonth,
+
+                applicationEndMonth:
+                    endMonth,
+
+                deadlineDate:
+                    estimatedDeadline,
+
                 today,
-                year: estimatedYear
+
+                year:
+                    estimatedYear
+
             });
+
         }
+
     }
 
-    // Example: "May 2027"
-    const singleMonthWithYear = raw.match(
-        /(?:usually\s+)?([A-Za-z]+)\s+(\d{4})/i
-    );
+
+    /*
+     * --------------------------------------------------
+     * 6. SINGLE MONTH WITH YEAR
+     *
+     * Example:
+     *
+     * "May 2027"
+     * --------------------------------------------------
+     */
+
+    const singleMonthWithYear =
+        raw.match(
+            /(?:usually\s+)?([A-Za-z]+)\s+(\d{4})/i
+        );
+
 
     if (singleMonthWithYear) {
-        const month = parseMonth(
-            singleMonthWithYear[1]
-        );
 
-        const year = Number(
-            singleMonthWithYear[2]
-        );
-
-        if (month !== null) {
-            const estimatedDeadline = createDate(
-                year,
-                month,
-                getLastDayOfMonth(
-                    year,
-                    month
-                )
+        const month =
+            parseMonth(
+                singleMonthWithYear[1]
             );
 
+
+        const year =
+            Number(
+                singleMonthWithYear[2]
+            );
+
+
+        if (
+            month !== null
+        ) {
+
+            const estimatedDeadline =
+                createDate(
+
+                    year,
+
+                    month,
+
+                    getLastDayOfMonth(
+                        year,
+                        month
+                    )
+
+                );
+
+
             return buildEstimatedDeadline({
-                source: raw,
-                applicationStartMonth: month,
-                applicationEndMonth: month,
-                deadlineDate: estimatedDeadline,
+
+                source:
+                    raw,
+
+                applicationStartMonth:
+                    month,
+
+                applicationEndMonth:
+                    month,
+
+                deadlineDate:
+                    estimatedDeadline,
+
                 today,
+
                 year
+
             });
+
         }
+
     }
+
+
+    /*
+     * --------------------------------------------------
+     * 7. UNKNOWN
+     * --------------------------------------------------
+     */
 
     return buildUnknownDeadline(
         raw,
         today
     );
+
 }
 
+
+/**
+ * Normalize an exact deadline.
+ */
 function normalizeDeadline({
     source,
     deadlinePrecision,
@@ -224,27 +548,57 @@ function normalizeDeadline({
     deadlineDate,
     today
 }) {
-    const todayDate = normalizeDate(today);
+
+    const todayDate =
+        normalizeDate(
+            today
+        );
+
+
     const normalizedDeadline =
-        normalizeDate(deadlineDate);
+        normalizeDate(
+            deadlineDate
+        );
+
 
     let currentCycleStatus;
 
-    if (normalizedDeadline < todayDate) {
-        currentCycleStatus = "closed";
+
+    if (
+        normalizedDeadline <
+        todayDate
+    ) {
+
+        currentCycleStatus =
+            "closed";
+
     } else if (
         applicationStartDate &&
-        normalizeDate(applicationStartDate) > todayDate
+        normalizeDate(
+            applicationStartDate
+        ) > todayDate
     ) {
-        currentCycleStatus = "upcoming";
+
+        currentCycleStatus =
+            "upcoming";
+
     } else {
-        currentCycleStatus = "open";
+
+        currentCycleStatus =
+            "open";
+
     }
 
-    const daysRemaining = calculateDaysBetween(
-        todayDate,
-        normalizedDeadline
-    );
+
+    const daysRemaining =
+        calculateDaysBetween(
+
+            todayDate,
+
+            normalizedDeadline
+
+        );
+
 
     const recommendedCycle =
         normalizedDeadline.getFullYear() +
@@ -254,21 +608,29 @@ function normalizeDeadline({
                 : 0
         );
 
+
     return {
-        deadline_source: "scholarship_data",
+
+        deadline_source:
+            "scholarship_data",
 
         deadline_precision:
             deadlinePrecision,
 
-        application_period: source,
+        application_period:
+            source,
 
         application_start_date:
             applicationStartDate
-                ? formatDate(applicationStartDate)
+                ? formatDate(
+                    applicationStartDate
+                )
                 : null,
 
         deadline_date:
-            formatDate(normalizedDeadline),
+            formatDate(
+                normalizedDeadline
+            ),
 
         current_cycle_status:
             currentCycleStatus,
@@ -286,9 +648,15 @@ function normalizeDeadline({
 
         requires_deadline_verification:
             false
+
     };
+
 }
 
+
+/**
+ * Build an estimated deadline.
+ */
 function buildEstimatedDeadline({
     source,
     applicationStartMonth,
@@ -297,34 +665,59 @@ function buildEstimatedDeadline({
     today,
     year
 }) {
-    const todayDate = normalizeDate(today);
+
+    const todayDate =
+        normalizeDate(
+            today
+        );
+
 
     const normalizedDeadline =
-        normalizeDate(deadlineDate);
+        normalizeDate(
+            deadlineDate
+        );
+
 
     const currentCycleStatus =
-        normalizedDeadline < todayDate
+        normalizedDeadline <
+        todayDate
+
             ? "estimated_closed"
+
             : "estimated";
 
-    const daysRemaining = calculateDaysBetween(
-        todayDate,
-        normalizedDeadline
-    );
+
+    const daysRemaining =
+        calculateDaysBetween(
+
+            todayDate,
+
+            normalizedDeadline
+
+        );
+
 
     return {
-        deadline_source: "scholarship_data",
 
-        deadline_precision: "estimated",
+        deadline_source:
+            "scholarship_data",
 
-        application_period: source,
+        deadline_precision:
+            "estimated",
 
-        application_start_date: null,
+        application_period:
+            source,
 
-        deadline_date: null,
+        application_start_date:
+            null,
+
+        deadline_date:
+            null,
 
         estimated_deadline_date:
-            formatDate(normalizedDeadline),
+            formatDate(
+                normalizedDeadline
+            ),
 
         estimated_application_start_month:
             applicationStartMonth,
@@ -350,51 +743,81 @@ function buildEstimatedDeadline({
 
         requires_deadline_verification:
             true
+
     };
+
 }
 
+
+/**
+ * Build an unknown deadline.
+ */
 function buildUnknownDeadline(
     source,
     today
 ) {
-    const year = today.getFullYear();
+
+    const year =
+        today.getFullYear();
+
 
     return {
-        deadline_source: "scholarship_data",
 
-        deadline_precision: "unknown",
+        deadline_source:
+            "scholarship_data",
+
+        deadline_precision:
+            "unknown",
 
         application_period:
             source || null,
 
-        application_start_date: null,
+        application_start_date:
+            null,
 
-        deadline_date: null,
+        deadline_date:
+            null,
 
-        estimated_deadline_date: null,
+        estimated_deadline_date:
+            null,
 
-        current_cycle_status: "unknown",
+        current_cycle_status:
+            "unknown",
 
-        days_remaining: null,
+        days_remaining:
+            null,
 
-        recommended_cycle: year,
+        recommended_cycle:
+            year,
 
-        strategy: "conservative",
+        strategy:
+            "conservative",
 
         requires_deadline_verification:
             true
+
     };
+
 }
 
-function parseMonth(monthName) {
+
+/**
+ * Convert month name to JavaScript month index.
+ */
+function parseMonth(
+    monthName
+) {
+
     if (!monthName) {
         return null;
     }
+
 
     const normalized =
         monthName
             .toLowerCase()
             .trim();
+
 
     if (
         Object.prototype.hasOwnProperty.call(
@@ -402,26 +825,49 @@ function parseMonth(monthName) {
             normalized
         )
     ) {
-        return MONTHS[normalized];
+
+        return MONTHS[
+            normalized
+        ];
+
     }
 
+
     return null;
+
 }
 
+
+/**
+ * Create a JavaScript Date.
+ */
 function createDate(
     year,
     month,
     day
 ) {
+
     return new Date(
         year,
         month,
         day
     );
+
 }
 
-function normalizeDate(date) {
-    const normalized = new Date(date);
+
+/**
+ * Normalize a date to midnight.
+ */
+function normalizeDate(
+    date
+) {
+
+    const normalized =
+        new Date(
+            date
+        );
+
 
     normalized.setHours(
         0,
@@ -430,76 +876,131 @@ function normalizeDate(date) {
         0
     );
 
+
     return normalized;
+
 }
 
+
+/**
+ * Get the last day of a month.
+ */
 function getLastDayOfMonth(
     year,
     month
 ) {
+
     return new Date(
         year,
         month + 1,
         0
     ).getDate();
+
 }
 
+
+/**
+ * Calculate number of days between dates.
+ */
 function calculateDaysBetween(
     startDate,
     endDate
 ) {
+
     const millisecondsPerDay =
         1000 *
         60 *
         60 *
         24;
 
+
     return Math.ceil(
+
         (
             endDate.getTime() -
             startDate.getTime()
         ) /
+
         millisecondsPerDay
+
     );
+
 }
 
+
+/**
+ * Infer the next appropriate year for a
+ * month-only deadline.
+ */
 function inferUpcomingYear(
     month,
     today
 ) {
+
     const currentYear =
         today.getFullYear();
+
 
     const currentMonth =
         today.getMonth();
 
-    if (month < currentMonth) {
-        return currentYear + 1;
+
+    if (
+        month <
+        currentMonth
+    ) {
+
+        return (
+            currentYear +
+            1
+        );
+
     }
 
+
     return currentYear;
+
 }
 
-function formatDate(date) {
+
+/**
+ * Format date as YYYY-MM-DD.
+ */
+function formatDate(
+    date
+) {
+
     if (!date) {
         return null;
     }
 
+
     const year =
         date.getFullYear();
+
 
     const month =
         String(
             date.getMonth() + 1
-        ).padStart(2, "0");
+        ).padStart(
+            2,
+            "0"
+        );
+
 
     const day =
         String(
             date.getDate()
-        ).padStart(2, "0");
+        ).padStart(
+            2,
+            "0"
+        );
+
 
     return `${year}-${month}-${day}`;
+
 }
+
 
 module.exports = {
     parseDeadline

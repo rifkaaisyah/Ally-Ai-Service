@@ -1,7 +1,10 @@
 {
   "scholarship": {
     "id": "chevening-001",
-    "name": "Chevening Scholarship"
+    "name": "Chevening Scholarship",
+    "deadline": {
+      "application_period": "2026-11-04"
+    }
   },
   "strategy": "conservative",
   "feasibility": "unknown",
@@ -23,21 +26,36 @@
               "title": "Collect your research projects",
               "description": "List the research projects you have participated in.",
               "type": "evidence",
-              "completed": true
+              "completed": true,
+              "timeline": {
+                "start_date": "2026-08-12",
+                "target_date": "2026-08-18",
+                "status": "scheduled"
+              }
             },
             {
               "id": "research-contribution",
               "title": "Explain your contribution",
               "description": "For each project, explain what you personally contributed.",
               "type": "reflection",
-              "completed": true
+              "completed": true,
+              "timeline": {
+                "start_date": "2026-08-19",
+                "target_date": "2026-08-25",
+                "status": "scheduled"
+              }
             },
             {
               "id": "research-achievements",
               "title": "Highlight research achievements",
               "description": "Add publications, presentations, awards or other research achievements.",
               "type": "evidence",
-              "completed": true
+              "completed": true,
+              "timeline": {
+                "start_date": "2026-08-26",
+                "target_date": "2026-09-01",
+                "status": "scheduled"
+              }
             }
           ],
           "progress": 100,
@@ -53,14 +71,24 @@
               "title": "Define your research topic",
               "description": "Write a short explanation of the research problem you want to explore.",
               "type": "writing",
-              "completed": false
+              "completed": false,
+              "timeline": {
+                "start_date": "2026-09-02",
+                "target_date": "2026-09-08",
+                "status": "scheduled"
+              }
             },
             {
               "id": "research-impact",
               "title": "Explain the potential impact",
               "description": "Explain why your research matters and who could benefit from it.",
               "type": "writing",
-              "completed": false
+              "completed": false,
+              "timeline": {
+                "start_date": "2026-09-09",
+                "target_date": "2026-09-15",
+                "status": "scheduled"
+              }
             }
           ],
           "progress": 0,
@@ -291,5 +319,111 @@
   "assessment": {
     "assessment_number": 2,
     "revised_percentage": 87
+  },
+  "timeline": {
+    "start_date": "2026-08-12",
+    "target_date": null,
+    "deadline": {
+      "deadline_source": "scholarship_data",
+      "deadline_precision": "unknown",
+      "application_period": "2026-11-04",
+      "application_start_date": null,
+      "deadline_date": null,
+      "estimated_deadline_date": null,
+      "current_cycle_status": "unknown",
+      "days_remaining": null,
+      "recommended_cycle": 2026,
+      "strategy": "conservative",
+      "requires_deadline_verification": true
+    },
+    "total_days": null,
+    "timeline_status": "needs_deadline_verification",
+    "valleys": [
+      {
+        "valley_id": "research-valley",
+        "status": "current",
+        "timeline_status": "scheduled",
+        "tasks": [
+          {
+            "id": "research-collect",
+            "title": "Collect your research projects",
+            "description": "List the research projects you have participated in.",
+            "type": "evidence",
+            "completed": false,
+            "timeline": {
+              "start_date": "2026-08-12",
+              "target_date": "2026-08-18",
+              "status": "scheduled"
+            }
+          },
+          {
+            "id": "research-contribution",
+            "title": "Explain your contribution",
+            "description": "For each project, explain what you personally contributed.",
+            "type": "reflection",
+            "completed": false,
+            "timeline": {
+              "start_date": "2026-08-19",
+              "target_date": "2026-08-25",
+              "status": "scheduled"
+            }
+          },
+          {
+            "id": "research-achievements",
+            "title": "Highlight research achievements",
+            "description": "Add publications, presentations, awards or other research achievements.",
+            "type": "evidence",
+            "completed": false,
+            "timeline": {
+              "start_date": "2026-08-26",
+              "target_date": "2026-09-01",
+              "status": "scheduled"
+            }
+          },
+          {
+            "id": "research-topic",
+            "title": "Define your research topic",
+            "description": "Write a short explanation of the research problem you want to explore.",
+            "type": "writing",
+            "completed": false,
+            "timeline": {
+              "start_date": "2026-09-02",
+              "target_date": "2026-09-08",
+              "status": "scheduled"
+            }
+          },
+          {
+            "id": "research-impact",
+            "title": "Explain the potential impact",
+            "description": "Explain why your research matters and who could benefit from it.",
+            "type": "writing",
+            "completed": false,
+            "timeline": {
+              "start_date": "2026-09-09",
+              "target_date": "2026-09-15",
+              "status": "scheduled"
+            }
+          }
+        ]
+      },
+      {
+        "valley_id": "leadership-valley",
+        "status": "locked",
+        "timeline_status": "locked",
+        "tasks": []
+      },
+      {
+        "valley_id": "essay-valley",
+        "status": "locked",
+        "timeline_status": "locked",
+        "tasks": []
+      },
+      {
+        "valley_id": "application-valley",
+        "status": "locked",
+        "timeline_status": "locked",
+        "tasks": []
+      }
+    ]
   }
 }

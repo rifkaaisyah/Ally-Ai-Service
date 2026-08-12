@@ -125,17 +125,20 @@ function generateValleys(
 
     return {
 
-        scholarship: {
+       scholarship: {
 
-            id:
-                scholarship?.id || null,
+    id:
+        scholarship?.id || null,
 
-            name:
-                scholarship?.name ||
-                scholarship?.metadata?.name ||
-                null
+    name:
+        scholarship?.name ||
+        scholarship?.metadata?.name ||
+        null,
 
-        },
+    deadline:
+        scholarship?.deadline || null
+
+},
 
         strategy:
             journeyPlan.strategy ||

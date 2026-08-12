@@ -5,7 +5,11 @@ const {
 /**
  * Evaluate a student's response to a journey task.
  *
- * This uses the existing AI service.
+ * The evaluator is intentionally designed to:
+ * 1. Return strict JSON.
+ * 2. Be reasonably consistent between similar answers.
+ * 3. Avoid rejecting a good answer just because the score is slightly below 70.
+ * 4. Prevent malformed AI JSON from breaking the journey.
  */
 async function evaluateTask({
     task,
@@ -17,14 +21,17 @@ async function evaluateTask({
         throw new Error("Task is required");
     }
 
-    if (!studentAnswer || !studentAnswer.trim()) {
+    if (
+        !studentAnswer ||
+        !studentAnswer.trim()
+    ) {
         throw new Error("Student answer is required");
     }
 
     const prompt = `
 You are Ally, an AI scholarship preparation assistant.
 
-Evaluate the student's response to a scholarship preparation task.
+Evaluate a student's response to a scholarship preparation task.
 
 Scholarship:
 ${scholarship?.name || "Unknown scholarship"}
@@ -38,7 +45,7 @@ ${task.description}
 Student response:
 ${studentAnswer}
 
-Evaluate the response based on:
+Evaluate the response using these criteria:
 
 1. Relevance to the task
 2. Specificity
@@ -46,9 +53,35 @@ Evaluate the response based on:
 4. Clarity
 5. Scholarship readiness
 
+IMPORTANT COMPLETION RULE:
+
+A response should be marked "completed" when it adequately answers the task and contains enough relevant information for scholarship preparation.
+
+Do NOT require a perfect answer.
+
+Do NOT reject a response merely because it could be improved.
+
+If the response is relevant, understandable, and provides reasonable evidence or explanation, it should normally be completed.
+
+Use "needs_improvement" only when the response is clearly insufficient, off-topic, extremely vague, or does not actually answer the task.
+
+Scoring guidance:
+
+90-100 = excellent
+80-89 = strong
+70-79 = acceptable/good
+60-69 = partially acceptable but needs meaningful improvement
+0-59 = insufficient
+
+IMPORTANT:
+
+A score between 60 and 69 may still be marked completed if the response adequately answers the task.
+
+The canComplete decision must be based on whether the student has provided enough information to move forward, NOT simply on whether the score is above 70.
+
 Return ONLY valid JSON.
 
-The response MUST use exactly this structure:
+Use EXACTLY this structure:
 
 {
   "score": 0,
@@ -60,35 +93,38 @@ The response MUST use exactly this structure:
 
 Rules:
 
-- score must be a number between 0 and 100.
+- score must be a number from 0 to 100.
 - status must be exactly "completed" or "needs_improvement".
 - canComplete must be exactly true or false.
 - feedback must be a string.
 - suggestions must be an array of strings.
-- Every string must have matching double quotes.
-- Every JSON object must be properly closed.
-- Every JSON array must be properly closed.
-- Every property must be separated by a comma.
-- Use standard JSON syntax.
+- If the answer is adequate, use status "completed" and canComplete true.
+- If the answer is clearly insufficient, use status "needs_improvement" and canComplete false.
+- Every JSON string must use double quotes.
 - Escape double quotes inside strings.
-- Do not put raw line breaks inside JSON strings.
-- Do not include markdown.
-- Do not include code fences.
-- Do not include explanations before or after the JSON.
+- Do not use markdown.
+- Do not use code fences.
+- Do not include explanations outside the JSON.
+- Do not include trailing commas.
+- Do not put raw line breaks inside strings.
 - Return JSON only.
-- Before returning the response, verify that it is valid JSON that can be parsed with JSON.parse().
 `;
 
-    const rawResponse = await generateAIResponse(prompt);
+    const rawResponse =
+        await generateAIResponse(prompt);
 
-    return parseEvaluationResponse(rawResponse);
+    return parseEvaluationResponse(
+        rawResponse
+    );
 }
 
 
 /**
  * Safely convert the AI response into JSON.
  */
-function parseEvaluationResponse(rawResponse) {
+function parseEvaluationResponse(
+    rawResponse
+) {
 
     if (!rawResponse) {
         throw new Error(
@@ -96,10 +132,11 @@ function parseEvaluationResponse(rawResponse) {
         );
     }
 
-    let cleaned = String(rawResponse).trim();
+    let cleaned =
+        String(rawResponse).trim();
 
     /**
-     * Remove accidental markdown fences.
+     * Remove markdown code fences.
      */
     cleaned = cleaned
         .replace(/^```json\s*/i, "")
@@ -107,17 +144,37 @@ function parseEvaluationResponse(rawResponse) {
         .replace(/\s*```$/i, "")
         .trim();
 
-
     /**
-     * First attempt:
-     *
-     * Try parsing exactly what the AI returned.
+     * If the AI accidentally included text before
+     * or after the JSON, extract the outer JSON object.
      */
+    const firstBrace =
+        cleaned.indexOf("{");
+
+    const lastBrace =
+        cleaned.lastIndexOf("}");
+
+    if (
+        firstBrace !== -1 &&
+        lastBrace !== -1 &&
+        lastBrace > firstBrace
+    ) {
+        cleaned =
+            cleaned.substring(
+                firstBrace,
+                lastBrace + 1
+            );
+    }
+
     let evaluation;
 
+    /**
+     * First attempt: parse exactly what we have.
+     */
     try {
 
-        evaluation = JSON.parse(cleaned);
+        evaluation =
+            JSON.parse(cleaned);
 
     }
     catch (firstError) {
@@ -126,9 +183,6 @@ function parseEvaluationResponse(rawResponse) {
             "Initial JSON parsing failed. Attempting repair..."
         );
 
-        /**
-         * Try repairing common AI JSON mistakes.
-         */
         const repaired =
             repairAIJson(cleaned);
 
@@ -178,7 +232,6 @@ function parseEvaluationResponse(rawResponse) {
         }
     }
 
-
     /**
      * Validate score.
      */
@@ -190,31 +243,21 @@ function parseEvaluationResponse(rawResponse) {
         score < 0 ||
         score > 100
     ) {
-
         throw new Error(
             "AI returned an invalid evaluation score"
         );
     }
 
-
     /**
-     * Normalize completion state.
+     * Normalize feedback.
      */
-    const canComplete =
-        evaluation.canComplete === true;
-
-
-    const status =
-        canComplete
-            ? "completed"
-            : "needs_improvement";
-
+    const feedback =
+        typeof evaluation.feedback === "string"
+            ? evaluation.feedback.trim()
+            : "";
 
     /**
      * Normalize suggestions.
-     *
-     * Make sure the FE always receives
-     * an array of strings.
      */
     let suggestions = [];
 
@@ -240,31 +283,47 @@ function parseEvaluationResponse(rawResponse) {
                 );
     }
 
+    /**
+     * Normalize completion state.
+     *
+     * We trust canComplete when it is a real boolean.
+     *
+     * However, if the AI returns a score >= 70
+     * and says completed, ensure the two values agree.
+     */
+    let canComplete =
+        evaluation.canComplete === true;
+
+    let status =
+        evaluation.status ===
+        "completed"
+            ? "completed"
+            : "needs_improvement";
+
+    /**
+     * Make completed + canComplete consistent.
+     */
+    if (status === "completed") {
+        canComplete = true;
+    }
+
+    if (canComplete === true) {
+        status = "completed";
+    }
 
     return {
-
         score,
-
         status,
-
-        feedback:
-            typeof evaluation.feedback === "string"
-                ? evaluation.feedback.trim()
-                : "",
-
+        feedback,
         suggestions,
-
         canComplete
-
     };
 }
 
 
 /**
- * Attempt to repair common malformed
- * JSON returned by an AI model.
- *
- * This is intentionally conservative.
+ * Attempt to repair common malformed JSON
+ * returned by an AI model.
  */
 function repairAIJson(text) {
 
@@ -272,67 +331,20 @@ function repairAIJson(text) {
         return null;
     }
 
-    let repaired = text.trim();
-
+    let repaired =
+        text.trim();
 
     /**
-     * --------------------------------------------------
-     * CASE 1
-     * --------------------------------------------------
-     *
-     * Missing closing ] for suggestions.
-     *
-     * Example:
-     *
-     * "suggestions": [
-     *   "Improve leadership evidence."
-     * "canComplete": true
-     *
-     * We insert:
-     *
-     * ],
-     *
+     * Remove markdown fences again just in case.
      */
-    repaired =
-        repairMissingSuggestionsArray(
-            repaired
-        );
-
-
-    /**
-     * --------------------------------------------------
-     * CASE 2
-     * --------------------------------------------------
-     *
-     * Missing comma between suggestion strings.
-     *
-     * Example:
-     *
-     * "suggestions": [
-     *   "Suggestion one"
-     *   "Suggestion two"
-     * ]
-     *
-     * Become:
-     *
-     * "suggestions": [
-     *   "Suggestion one",
-     *   "Suggestion two"
-     * ]
-     */
-    repaired =
-        repairMissingSuggestionComma(
-            repaired
-        );
-
+    repaired = repaired
+        .replace(/^```json\s*/i, "")
+        .replace(/^```\s*/i, "")
+        .replace(/\s*```$/i, "")
+        .trim();
 
     /**
-     * --------------------------------------------------
-     * CASE 3
-     * --------------------------------------------------
-     *
-     * Remove accidental control characters
-     * inside JSON strings.
+     * Remove accidental control characters.
      */
     repaired =
         repaired.replace(
@@ -340,9 +352,68 @@ function repairAIJson(text) {
             " "
         );
 
+    /**
+     * Fix missing commas between JSON array strings.
+     *
+     * Example:
+     *
+     * [
+     *   "one"
+     *   "two"
+     * ]
+     *
+     * becomes:
+     *
+     * [
+     *   "one",
+     *   "two"
+     * ]
+     */
+    repaired =
+        repaired.replace(
+            /"\s*\n\s*"/g,
+            '",\n"'
+        );
 
     /**
-     * Try parsing the repaired result.
+     * Fix a common missing comma before the next property.
+     *
+     * Example:
+     *
+     * "suggestion"
+     * }
+     *
+     * becomes:
+     *
+     * "suggestion"
+     * ],
+     * }
+     *
+     * only when appropriate.
+     */
+
+    repaired =
+        repairSuggestionsArray(
+            repaired
+        );
+
+    /**
+     * Remove trailing commas.
+     *
+     * JSON does not allow:
+     *
+     * {
+     *   "score": 80,
+     * }
+     */
+    repaired =
+        repaired.replace(
+            /,\s*([}\]])/g,
+            "$1"
+        );
+
+    /**
+     * Try parsing.
      */
     try {
 
@@ -359,9 +430,9 @@ function repairAIJson(text) {
 
 
 /**
- * Repair a missing closing ] in suggestions.
+ * Repair a missing closing suggestions array.
  */
-function repairMissingSuggestionsArray(text) {
+function repairSuggestionsArray(text) {
 
     const suggestionsIndex =
         text.indexOf(
@@ -373,55 +444,44 @@ function repairMissingSuggestionsArray(text) {
             '"canComplete"'
         );
 
-
     if (
         suggestionsIndex === -1 ||
         canCompleteIndex === -1 ||
         canCompleteIndex <= suggestionsIndex
     ) {
-
         return text;
     }
 
-
-    const suggestionsSection =
+    const section =
         text.substring(
             suggestionsIndex,
             canCompleteIndex
         );
 
-
     /**
-     * If the array is already closed,
-     * nothing needs to be done.
+     * If the suggestions array already contains
+     * a closing bracket, leave it alone.
      */
     if (
-        suggestionsSection.includes("]")
+        section.includes("]")
     ) {
-
         return text;
     }
 
-
     /**
-     * Find the last quote before canComplete.
+     * Find the last quote in the suggestions section.
      */
     const lastQuote =
-        suggestionsSection.lastIndexOf(
-            '"'
-        );
-
+        section.lastIndexOf('"');
 
     if (lastQuote === -1) {
         return text;
     }
 
-
     const absolutePosition =
         suggestionsIndex +
         lastQuote +
         1;
-
 
     return (
         text.substring(
@@ -432,84 +492,6 @@ function repairMissingSuggestionsArray(text) {
         text.substring(
             canCompleteIndex
         )
-    );
-}
-
-
-/**
- * Repair missing commas between
- * suggestion strings.
- */
-function repairMissingSuggestionComma(text) {
-
-    const suggestionsIndex =
-        text.indexOf(
-            '"suggestions"'
-        );
-
-    if (
-        suggestionsIndex === -1
-    ) {
-
-        return text;
-    }
-
-
-    const arrayStart =
-        text.indexOf(
-            "[",
-            suggestionsIndex
-        );
-
-    const arrayEnd =
-        text.indexOf(
-            "]",
-            arrayStart
-        );
-
-
-    if (
-        arrayStart === -1 ||
-        arrayEnd === -1
-    ) {
-
-        return text;
-    }
-
-
-    const before =
-        text.substring(
-            0,
-            arrayStart + 1
-        );
-
-    const array =
-        text.substring(
-            arrayStart + 1,
-            arrayEnd
-        );
-
-    const after =
-        text.substring(
-            arrayEnd
-        );
-
-
-    /**
-     * Add commas where two JSON strings
-     * are accidentally placed next to each other.
-     */
-    const repairedArray =
-        array.replace(
-            /"\s*\n\s*"/g,
-            '",\n"'
-        );
-
-
-    return (
-        before +
-        repairedArray +
-        after
     );
 }
 

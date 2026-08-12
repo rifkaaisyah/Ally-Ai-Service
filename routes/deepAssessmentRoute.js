@@ -8,10 +8,9 @@ const {
 
 
 
-router.post("/deep", (req,res)=>{
+router.post("/deep", async (req, res) => {
 
     try {
-
 
         const {
             answers,
@@ -20,14 +19,18 @@ router.post("/deep", (req,res)=>{
 
 
 
-        if(!answers){
+        // ---------------------------------------------------------
+        // 1. Validate answers
+        // ---------------------------------------------------------
+
+        if (!answers) {
 
             return res.status(400).json({
 
-                status:"error",
+                status: "error",
 
                 message:
-                "Assessment answers are required"
+                    "Assessment answers are required"
 
             });
 
@@ -35,35 +38,97 @@ router.post("/deep", (req,res)=>{
 
 
 
+        // ---------------------------------------------------------
+        // 2. Run deep assessment
+        // ---------------------------------------------------------
+
         const result =
-            analyzeDeepAssessment(
+            await analyzeDeepAssessment(
                 answers,
                 uploads || {}
             );
 
 
 
+        // ---------------------------------------------------------
+        // 3. Validate result
+        //
+        // The journey engine needs the student profile.
+        // ---------------------------------------------------------
+
+        if (!result) {
+
+            throw new Error(
+                "Deep assessment returned no result"
+            );
+
+        }
+
+
+
+        if (!result.profile) {
+
+            console.error(
+                "Deep assessment result is missing profile:",
+                JSON.stringify(
+                    result,
+                    null,
+                    2
+                )
+            );
+
+            throw new Error(
+                "Deep assessment did not return a student profile"
+            );
+
+        }
+
+
+
+        // ---------------------------------------------------------
+        // 4. Return assessment + profile
+        //
+        // IMPORTANT:
+        // Previously this route returned ONLY:
+        //
+        // data: {
+        //     assessment: result.assessment
+        // }
+        //
+        // That caused /api/journey to fail because it could not
+        // find the student profile.
+        // ---------------------------------------------------------
+
         return res.json({
 
-            status:"success",
+            status: "success",
 
             message:
-            "Deep assessment analyzed successfully",
+                "Deep assessment analyzed successfully",
 
-            data:{
+            data: {
 
+                // Assessment result
                 assessment:
-                result.assessment
+                    result.assessment || null,
+
+
+                // Full profile object
+                profile:
+                    result.profile || null,
+
+
+                // Convenient direct access for consumers
+                // that expect student_profile.
+                student_profile:
+                    result.profile?.student_profile || null
 
             }
 
         });
 
-
-
     }
-    catch(error){
-
+    catch (error) {
 
         console.error(
             "Deep Assessment Error:",
@@ -73,17 +138,17 @@ router.post("/deep", (req,res)=>{
 
         return res.status(500).json({
 
-            status:"error",
+            status: "error",
 
-            message:error.message
+            message:
+                error.message
 
         });
 
-
     }
 
-
 });
+
 
 
 module.exports = router;

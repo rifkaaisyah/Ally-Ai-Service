@@ -3,50 +3,66 @@ const {
     generateAIResponse
 } = require("../services/aiService");
 
+
 const {
     hybridRank
 } = require("./hybridMatcher");
+
+
 const {
     generateScholarshipQuery
 } = require("./queryGenerator");
+
 
 const {
     searchSimilarScholarships
 } = require("./vectorStore");
 
+
 const {
     buildScholarshipPrompt
 } = require("./promptBuilder");
+
 
 const {
     loadScholarships
 } = require("./documentLoader");
 
+
 const {
     filterScholarships
 } = require("./filterService");
+
 
 const {
     adaptAssessmentProfile
 } = require("./profileAdapter");
 
+
 const {
     generateRoadmap
 } = require("../services/roadmapService");
+
 
 const {
     attachDeadlineInformation
 } = require("../services/scholarshipDeadlineService");
 
+
+
 async function getScholarshipRecommendation(
     studentProfile
 ) {
-     studentProfile =
+
+    studentProfile =
         adaptAssessmentProfile(
             studentProfile
         );
 
-    // 1. Build a natural language query from the student's profile
+
+    // ---------------------------------------------------------
+    // 1. Build natural language query
+    // ---------------------------------------------------------
 
     const userQuery =
         generateScholarshipQuery(
@@ -54,13 +70,17 @@ async function getScholarshipRecommendation(
         );
 
 
+    // ---------------------------------------------------------
     // 2. Load all scholarships
+    // ---------------------------------------------------------
 
     const allScholarships =
         await loadScholarships();
 
 
-    // 3. Filter scholarships using profile information
+    // ---------------------------------------------------------
+    // 3. Filter scholarships
+    // ---------------------------------------------------------
 
     const filteredScholarships =
         filterScholarships(
@@ -69,15 +89,20 @@ async function getScholarshipRecommendation(
         );
 
 
-    // 4. Get the IDs of filtered scholarships
+    // ---------------------------------------------------------
+    // 4. Get allowed scholarship IDs
+    // ---------------------------------------------------------
 
     const allowedIds =
         filteredScholarships.map(
-            scholarship => scholarship.id
+            scholarship =>
+                scholarship.id
         );
 
 
-    // 5. Generate embedding for the student's query
+    // ---------------------------------------------------------
+    // 5. Generate embedding
+    // ---------------------------------------------------------
 
     const queryVector =
         await generateEmbedding(
@@ -85,50 +110,95 @@ async function getScholarshipRecommendation(
         );
 
 
-    // 6. Search only within filtered scholarships
+    // ---------------------------------------------------------
+    // 6. Search filtered scholarships
+    // ---------------------------------------------------------
 
     const scholarships =
-    await searchSimilarScholarships(
-        queryVector,
-        10,
-        allowedIds
-    );
-const rankedScholarships =
-    hybridRank(
-        studentProfile,
-        scholarships
-    );
+        await searchSimilarScholarships(
+            queryVector,
+            10,
+            allowedIds
+        );
+
+
+    // ---------------------------------------------------------
+    // 7. Rank scholarships
+    // ---------------------------------------------------------
+
+    const rankedScholarships =
+        hybridRank(
+            studentProfile,
+            scholarships
+        );
+
+
     console.log(
-    JSON.stringify(
-        rankedScholarships,
-        null,
-        2
-    )
-);
-
-
-const topScholarships =
-    rankedScholarships.slice(0, 3);
-
-const scholarshipsWithDeadlines =
-    attachDeadlineInformation(
-        topScholarships
+        JSON.stringify(
+            rankedScholarships,
+            null,
+            2
+        )
     );
-    // 7. Build the prompt
+
+
+    // ---------------------------------------------------------
+    // 8. Pick ONLY the highest-ranked scholarship
+    //
+    // hybridRank already orders the scholarships from
+    // highest score to lowest score.
+    // ---------------------------------------------------------
+
+    const beasiswa_recomendation =
+        rankedScholarships[0];
+
+
+    // ---------------------------------------------------------
+    // 9. Attach deadline information
+    // ---------------------------------------------------------
+
+    const scholarshipsWithDeadlines =
+        attachDeadlineInformation(
+            beasiswa_recomendation
+                ? [beasiswa_recomendation]
+                : []
+        );
+
+
+    const finalRecommendation =
+        scholarshipsWithDeadlines[0] || null;
+
+
+    // ---------------------------------------------------------
+    // 10. Generate roadmap
+    // ---------------------------------------------------------
+
     const roadmap =
-    generateRoadmap(
-        studentProfile,
-        scholarshipsWithDeadlines
-    );
- const prompt =
-    buildScholarshipPrompt(
-        userQuery,
-        scholarshipsWithDeadlines,
-        roadmap
-    );
+        generateRoadmap(
+            studentProfile,
+            finalRecommendation
+                ? [finalRecommendation]
+                : []
+        );
 
 
-    // 8. Generate the AI response
+    // ---------------------------------------------------------
+    // 11. Build AI prompt
+    // ---------------------------------------------------------
+
+    const prompt =
+        buildScholarshipPrompt(
+            userQuery,
+            finalRecommendation
+                ? [finalRecommendation]
+                : [],
+            roadmap
+        );
+
+
+    // ---------------------------------------------------------
+    // 12. Generate AI response
+    // ---------------------------------------------------------
 
     const answer =
         await generateAIResponse(
@@ -136,15 +206,21 @@ const scholarshipsWithDeadlines =
         );
 
 
+    // ---------------------------------------------------------
+    // 13. Return ONE scholarship recommendation
+    // ---------------------------------------------------------
+
     return {
-    recommendedScholarships:
-        scholarshipsWithDeadlines,
 
-    roadmap,
+        beasiswa_recomendation:
+            finalRecommendation,
 
-    aiRecommendation:
-        answer
-};
+        roadmap,
+
+        aiRecommendation:
+            answer
+
+    };
 
 }
 

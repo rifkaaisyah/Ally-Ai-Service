@@ -53,24 +53,24 @@
               "title": "Define your research topic",
               "description": "Write a short explanation of the research problem you want to explore.",
               "type": "writing",
-              "completed": false
+              "completed": true
             },
             {
               "id": "research-impact",
               "title": "Explain the potential impact",
               "description": "Explain why your research matters and who could benefit from it.",
               "type": "writing",
-              "completed": false
+              "completed": true
             }
           ],
-          "progress": 0,
-          "completed": false
+          "progress": 100,
+          "completed": true
         }
       ],
       "order": 1,
-      "status": "current",
-      "progress": 60,
-      "completed": false
+      "status": "completed",
+      "progress": 100,
+      "completed": true
     },
     {
       "id": "leadership-valley",
@@ -87,25 +87,25 @@
               "title": "List your leadership experiences",
               "description": "Write down organizations, projects, teams or initiatives you have led.",
               "type": "evidence",
-              "completed": false
+              "completed": true
             },
             {
               "id": "leadership-role",
               "title": "Describe your role",
               "description": "Explain what you were responsible for in each leadership experience.",
               "type": "reflection",
-              "completed": false
+              "completed": true
             },
             {
               "id": "leadership-impact",
               "title": "Measure your impact",
               "description": "Add measurable results such as people reached, money raised, projects completed or improvements achieved.",
               "type": "evidence",
-              "completed": false
+              "completed": true
             }
           ],
-          "progress": 0,
-          "completed": false
+          "progress": 100,
+          "completed": true
         },
         {
           "id": "leadership-story",
@@ -117,24 +117,24 @@
               "title": "Write one STAR story",
               "description": "Describe one leadership experience using Situation, Task, Action and Result.",
               "type": "writing",
-              "completed": false
+              "completed": true
             },
             {
               "id": "leadership-lesson",
               "title": "Explain what you learned",
               "description": "Explain how the experience changed your leadership approach.",
               "type": "reflection",
-              "completed": false
+              "completed": true
             }
           ],
-          "progress": 0,
-          "completed": false
+          "progress": 100,
+          "completed": true
         }
       ],
       "order": 2,
-      "status": "locked",
-      "progress": 0,
-      "completed": false
+      "status": "completed",
+      "progress": 100,
+      "completed": true
     },
     {
       "id": "essay-valley",
@@ -151,18 +151,18 @@
               "title": "Why this scholarship?",
               "description": "Write why you want this scholarship and what you hope to achieve.",
               "type": "writing",
-              "completed": false
+              "completed": true
             },
             {
               "id": "essay-university",
               "title": "Why this university?",
               "description": "Explain why the university and program are relevant to your goals.",
               "type": "writing",
-              "completed": false
+              "completed": true
             }
           ],
-          "progress": 0,
-          "completed": false
+          "progress": 100,
+          "completed": true
         },
         {
           "id": "essay-star",
@@ -174,18 +174,18 @@
               "title": "Write using the STAR method",
               "description": "Rewrite an important experience using Situation, Task, Action and Result.",
               "type": "writing",
-              "completed": false
+              "completed": true
             },
             {
               "id": "essay-impact",
               "title": "Add measurable impact",
               "description": "Include concrete outcomes instead of only describing what you did.",
               "type": "writing",
-              "completed": false
+              "completed": true
             }
           ],
-          "progress": 0,
-          "completed": false
+          "progress": 100,
+          "completed": true
         },
         {
           "id": "essay-review",
@@ -197,24 +197,24 @@
               "title": "Check your story flow",
               "description": "Make sure the essay has a clear beginning, development and conclusion.",
               "type": "review",
-              "completed": false
+              "completed": true
             },
             {
               "id": "essay-alignment",
               "title": "Check scholarship alignment",
               "description": "Make sure your experiences and goals directly answer the scholarship criteria.",
               "type": "review",
-              "completed": false
+              "completed": true
             }
           ],
-          "progress": 0,
-          "completed": false
+          "progress": 100,
+          "completed": true
         }
       ],
       "order": 3,
-      "status": "locked",
-      "progress": 0,
-      "completed": false
+      "status": "completed",
+      "progress": 100,
+      "completed": true
     },
     {
       "id": "application-valley",
@@ -231,25 +231,25 @@
               "title": "Update your CV",
               "description": "Make sure your CV reflects your strongest academic, professional and leadership achievements.",
               "type": "document",
-              "completed": false
+              "completed": true
             },
             {
               "id": "application-transcript",
               "title": "Prepare academic documents",
               "description": "Collect transcripts, certificates and other academic records.",
               "type": "document",
-              "completed": false
+              "completed": true
             },
             {
               "id": "application-recommendation",
               "title": "Prepare recommendation letters",
               "description": "Identify referees and request recommendation letters early.",
               "type": "document",
-              "completed": false
+              "completed": true
             }
           ],
-          "progress": 0,
-          "completed": false
+          "progress": 100,
+          "completed": true
         },
         {
           "id": "application-final-review",
@@ -261,31 +261,31 @@
               "title": "Check every requirement",
               "description": "Compare your application against the scholarship requirements.",
               "type": "review",
-              "completed": false
+              "completed": true
             },
             {
               "id": "application-proofread",
               "title": "Proofread everything",
               "description": "Check spelling, formatting and consistency across all application materials.",
               "type": "review",
-              "completed": false
+              "completed": true
             },
             {
               "id": "application-submit",
               "title": "Submit your application",
               "description": "Submit the completed application before the deadline.",
               "type": "submission",
-              "completed": false
+              "completed": true
             }
           ],
-          "progress": 0,
-          "completed": false
+          "progress": 100,
+          "completed": true
         }
       ],
       "order": 4,
-      "status": "locked",
-      "progress": 0,
-      "completed": false
+      "status": "completed",
+      "progress": 100,
+      "completed": true
     }
   ],
   "assessment": {

@@ -1,0 +1,58 @@
+[
+    {
+        "id": "mentor-001",
+        "name": "Sarah",
+        "fields": [
+            "Artificial Intelligence",
+            "Computer Science"
+        ],
+        "career_areas": [
+            "Artificial Intelligence",
+            "Technology",
+            "Education Technology"
+        ],
+        "countries": [
+            "Indonesia",
+            "United Kingdom"
+        ],
+        "leadership_experience": true,
+        "bio": "AI professional with scholarship and postgraduate experience."
+    },
+    {
+        "id": "mentor-002",
+        "name": "Daniel",
+        "fields": [
+            "Engineering",
+            "Computer Science"
+        ],
+        "career_areas": [
+            "Technology",
+            "Research"
+        ],
+        "countries": [
+            "Indonesia",
+            "Japan"
+        ],
+        "leadership_experience": true,
+        "bio": "Technology researcher and postgraduate scholarship mentor."
+    },
+    {
+        "id": "mentor-003",
+        "name": "Aisha",
+        "fields": [
+            "Business",
+            "Public Policy"
+        ],
+        "career_areas": [
+            "Education",
+            "Social Impact",
+            "Public Policy"
+        ],
+        "countries": [
+            "Indonesia",
+            "Australia"
+        ],
+        "leadership_experience": true,
+        "bio": "Scholarship alumna focused on education and social impact."
+    }
+]

@@ -1,12 +1,11 @@
 const axios = require("axios");
 
-const BASE_URL =
-    "http://localhost:3001";
+const BASE_URL = "http://localhost:3001";
 
 /*
-=====================================================
+=================================================
 REAL JOURNEY PROGRESSION TEST
-=====================================================
+=================================================
 
 IMPORTANT:
 
@@ -15,55 +14,53 @@ Use a completely NEW student ID.
 This test verifies:
 
 Research
-    ↓
+↓
 Leadership
-    ↓
+↓
 Essay
-    ↓
+↓
 Application
 
 It uses the REAL API endpoints.
 
 It also verifies persistence after each stage.
-=====================================================
+*/
+
+/*
+=================================================
+STUDENT ID
+=================================================
 */
 
 const studentId =
-    "student-journey-progression-test-002";
+    "student-journey-progression-test-004";
 
 /*
-=====================================================
+=================================================
 SCHOLARSHIP
-=====================================================
+=================================================
 */
 
 const scholarship = {
 
-    id:
-        "chevening-001",
+    id: "chevening-001",
 
-    name:
-        "Chevening Scholarship",
+    name: "Chevening Scholarship",
 
     deadline: {
-
-        application_period:
-            "2026-11-04"
-
+        application_period: "2026-11-04"
     }
 
 };
 
-
 /*
-=====================================================
+=================================================
 ASSESSMENT 2 ANSWERS
-=====================================================
+=================================================
 
 No readiness is supplied.
 
 The backend calculates it.
-=====================================================
 */
 
 const answers = {
@@ -143,11 +140,10 @@ const answers = {
 
 };
 
-
 /*
-=====================================================
+=================================================
 PRINT JOURNEY STATUS
-=====================================================
+=================================================
 */
 
 function printValleyStatus(journey) {
@@ -167,11 +163,10 @@ function printValleyStatus(journey) {
 
 }
 
-
 /*
-=====================================================
+=================================================
 FIND TASK
-=====================================================
+=================================================
 */
 
 function findTask(
@@ -199,11 +194,8 @@ function findTask(
                 ) {
 
                     return {
-
                         task,
-
                         valley
-
                     };
 
                 }
@@ -218,16 +210,13 @@ function findTask(
 
 }
 
-
 /*
-=====================================================
+=================================================
 GET CURRENT VALLEY
-=====================================================
+=================================================
 */
 
-function getCurrentValley(
-    journey
-) {
+function getCurrentValley(journey) {
 
     return (
         journey.valleys || []
@@ -238,23 +227,28 @@ function getCurrentValley(
 
 }
 
-
 /*
-=====================================================
-GET INCOMPLETE TASKS FROM CURRENT VALLEY
-=====================================================
+=================================================
+GET INCOMPLETE TASKS FROM A SPECIFIC VALLEY
+=================================================
+
+IMPORTANT:
+
+This function deliberately receives a valley.
+
+We DO NOT look up the current valley here.
+
+Otherwise, when Research becomes completed,
+Leadership becomes current and the test would
+accidentally continue completing Leadership.
+=================================================
 */
 
-function getIncompleteTasks(
-    journey
+function getIncompleteTasksFromValley(
+    valley
 ) {
 
-    const currentValley =
-        getCurrentValley(
-            journey
-        );
-
-    if (!currentValley) {
+    if (!valley) {
 
         return [];
 
@@ -264,7 +258,7 @@ function getIncompleteTasks(
 
     for (
         const checkpoint
-        of currentValley.checkpoints || []
+        of valley.checkpoints || []
     ) {
 
         for (
@@ -276,9 +270,7 @@ function getIncompleteTasks(
                 !task.completed
             ) {
 
-                tasks.push(
-                    task
-                );
+                tasks.push(task);
 
             }
 
@@ -290,21 +282,17 @@ function getIncompleteTasks(
 
 }
 
-
 /*
-=====================================================
+=================================================
 ANSWER GENERATOR
-=====================================================
+=================================================
 
 These answers are intentionally specific enough
-for the current AI evaluator to complete tasks.
-
-=====================================================
+for the current AI evaluator.
+=================================================
 */
 
-function answerForTask(
-    taskId
-) {
+function answerForTask(taskId) {
 
     const answers = {
 
@@ -329,16 +317,15 @@ function answerForTask(
         "research-impact":
             "The project helped our team develop evidence-based recommendations and present practical findings to our academic supervisor. It strengthened my ability to connect research with real-world community impact.",
 
-
         /*
         -----------------------------
         LEADERSHIP
         -----------------------------
         */
 
-        
         "leadership-activities":
-             "I have two leadership experiences. First, I participated in a university student organization where I worked with other students on academic and community-related activities. Second, I led a university research project involving four students. In the research project, I coordinated the team, divided responsibilities, organized weekly meetings, managed the timeline, and helped the team complete and present the research findings to our academic supervisor.",
+            "I have two leadership experiences. First, I participated in a university student organization where I worked with other students on academic and community-related activities. Second, I led a university research project involving four students. In the research project, I coordinated the team, divided responsibilities, organized weekly meetings, managed the timeline, and helped the team complete and present the research findings to our academic supervisor.",
+
         "leadership-role":
             "I coordinated a university research project, divided responsibilities among team members, organized weekly meetings, and managed the project timeline.",
 
@@ -350,7 +337,6 @@ function answerForTask(
 
         "leadership-lesson":
             "I learned that effective leadership requires clear communication, delegation, accountability, and adapting when team members face challenges.",
-
 
         /*
         -----------------------------
@@ -375,7 +361,6 @@ function answerForTask(
 
         "essay-alignment":
             "My experiences and career goals align with a scholarship focused on leadership, professional development, international learning, and creating positive impact in my community.",
-
 
         /*
         -----------------------------
@@ -403,7 +388,6 @@ function answerForTask(
 
     };
 
-
     return (
         answers[taskId] ||
         "I completed this task by applying my academic, research, leadership, and career experience to my scholarship preparation. I reviewed my evidence carefully and identified specific outcomes and next steps."
@@ -411,16 +395,13 @@ function answerForTask(
 
 }
 
-
 /*
-=====================================================
+=================================================
 SUBMIT TASK
-=====================================================
+=================================================
 */
 
-async function submitTask(
-    task
-) {
+async function submitTask(task) {
 
     console.log(
         `\nSubmitting task: ${task.id}`
@@ -505,11 +486,10 @@ async function submitTask(
 
 }
 
-
 /*
-=====================================================
+=================================================
 VERIFY PERSISTENCE
-=====================================================
+=================================================
 */
 
 async function verifyPersistence(
@@ -585,14 +565,44 @@ async function verifyPersistence(
 
 }
 
-
 /*
-=====================================================
-COMPLETE CURRENT VALLEY
-=====================================================
+=================================================
+COMPLETE ONE SPECIFIC VALLEY
+=================================================
+
+THIS IS THE IMPORTANT FIX.
+
+We capture the valley at the beginning.
+
+Then we ONLY submit incomplete tasks belonging
+to that valley.
+
+When the valley becomes completed, the backend
+may unlock the next valley.
+
+We DO NOT follow the newly unlocked valley.
+
+Therefore:
+
+complete Research
+→ stop
+
+Then verify Leadership is current.
+
+Then:
+
+complete Leadership
+→ stop
+
+And so on.
+=================================================
 */
 
 async function completeCurrentValley() {
+
+    /*
+     * Get fresh journey.
+     */
 
     let response =
         await axios.get(
@@ -604,12 +614,16 @@ async function completeCurrentValley() {
     let journey =
         response.data.journey;
 
-    const currentValley =
+    /*
+     * Capture the current valley NOW.
+     */
+
+    const targetValley =
         getCurrentValley(
             journey
         );
 
-    if (!currentValley) {
+    if (!targetValley) {
 
         throw new Error(
             "No current valley found"
@@ -617,16 +631,32 @@ async function completeCurrentValley() {
 
     }
 
+    /*
+     * IMPORTANT:
+     *
+     * Store the valley ID/name.
+     *
+     * We will continue working ONLY on this
+     * valley even after the backend unlocks
+     * the next valley.
+     */
+
+    const targetValleyId =
+        targetValley.id;
+
+    const targetValleyName =
+        targetValley.name;
+
     console.log(
-        `\n======================================`
+        "\n======================================"
     );
 
     console.log(
-        `CURRENT VALLEY: ${currentValley.name}`
+        `CURRENT VALLEY: ${targetValleyName}`
     );
 
     console.log(
-        `======================================`
+        "======================================"
     );
 
     let safetyCounter = 0;
@@ -645,10 +675,42 @@ async function completeCurrentValley() {
 
         }
 
-        const incompleteTasks =
-            getIncompleteTasks(
-                journey
+        /*
+         * Find the SAME valley from the latest
+         * journey response.
+         */
+
+        const latestTargetValley =
+            (
+                journey.valleys || []
+            ).find(
+                valley =>
+                    valley.id ===
+                    targetValleyId
             );
+
+        if (!latestTargetValley) {
+
+            throw new Error(
+                `Could not find target valley ${targetValleyName}`
+            );
+
+        }
+
+        /*
+         * Get incomplete tasks ONLY from the
+         * target valley.
+         */
+
+        const incompleteTasks =
+            getIncompleteTasksFromValley(
+                latestTargetValley
+            );
+
+        /*
+         * If there are no incomplete tasks,
+         * this valley is finished.
+         */
 
         if (
             incompleteTasks.length === 0
@@ -659,7 +721,8 @@ async function completeCurrentValley() {
         }
 
         /*
-         * Always submit the first incomplete task.
+         * Always submit the first incomplete
+         * task belonging to THIS valley.
          */
 
         const task =
@@ -686,11 +749,15 @@ async function completeCurrentValley() {
     journey =
         finalResponse.data.journey;
 
+    /*
+     * Find the target valley again.
+     */
+
     const completedValley =
         journey.valleys.find(
             valley =>
-                valley.name ===
-                currentValley.name
+                valley.id ===
+                targetValleyId
         );
 
     if (
@@ -698,18 +765,18 @@ async function completeCurrentValley() {
     ) {
 
         throw new Error(
-            `Could not find completed valley ${currentValley.name}`
+            `Could not find completed valley ${targetValleyName}`
         );
 
     }
 
     console.log(
-        `\n${currentValley.name} FINAL STATUS:`,
+        `\n${targetValleyName} FINAL STATUS:`,
         completedValley.status
     );
 
     console.log(
-        `${currentValley.name} FINAL PROGRESS:`,
+        `${targetValleyName} FINAL PROGRESS:`,
         completedValley.progress + "%"
     );
 
@@ -719,7 +786,7 @@ async function completeCurrentValley() {
     ) {
 
         throw new Error(
-            `${currentValley.name} did not become completed`
+            `${targetValleyName} did not become completed`
         );
 
     }
@@ -730,7 +797,7 @@ async function completeCurrentValley() {
     ) {
 
         throw new Error(
-            `${currentValley.name} did not reach 100%`
+            `${targetValleyName} did not reach 100%`
         );
 
     }
@@ -739,11 +806,10 @@ async function completeCurrentValley() {
 
 }
 
-
 /*
-=====================================================
+=================================================
 MAIN TEST
-=====================================================
+=================================================
 */
 
 async function run() {
@@ -764,7 +830,6 @@ async function run() {
         "\nStudent ID:",
         studentId
     );
-
 
     /*
     =================================================
@@ -805,15 +870,12 @@ async function run() {
         createResponse.data.success
     );
 
-
     let journey =
         createResponse.data.journey;
-
 
     printValleyStatus(
         journey
     );
-
 
     /*
     =================================================
@@ -866,11 +928,9 @@ async function run() {
 
         ];
 
-
     await verifyPersistence(
         initialExpected
     );
-
 
     /*
     =================================================
@@ -884,7 +944,6 @@ async function run() {
 
     journey =
         await completeCurrentValley();
-
 
     /*
     =================================================
@@ -941,7 +1000,6 @@ async function run() {
 
         );
 
-
     /*
     =================================================
     5. COMPLETE LEADERSHIP
@@ -954,7 +1012,6 @@ async function run() {
 
     journey =
         await completeCurrentValley();
-
 
     /*
     =================================================
@@ -1011,7 +1068,6 @@ async function run() {
 
         );
 
-
     /*
     =================================================
     7. COMPLETE ESSAY
@@ -1024,7 +1080,6 @@ async function run() {
 
     journey =
         await completeCurrentValley();
-
 
     /*
     =================================================
@@ -1081,7 +1136,6 @@ async function run() {
 
         );
 
-
     /*
     =================================================
     9. COMPLETE APPLICATION
@@ -1094,7 +1148,6 @@ async function run() {
 
     journey =
         await completeCurrentValley();
-
 
     /*
     =================================================
@@ -1151,7 +1204,6 @@ async function run() {
 
         );
 
-
     /*
     =================================================
     VERIFY ALL VALLEYS = 100%
@@ -1185,10 +1237,9 @@ async function run() {
 
     }
 
-
     /*
     =================================================
-    VERIFY FINAL PERSISTENCE
+    11. FINAL PERSISTENCE CHECK
     =================================================
     */
 
@@ -1217,7 +1268,6 @@ async function run() {
 
     }
 
-
     console.log(
         "\n======================================"
     );
@@ -1232,15 +1282,13 @@ async function run() {
 
 }
 
-
 /*
-=====================================================
+=================================================
 ERROR HANDLING
-=====================================================
+=================================================
 */
 
 run()
-
     .catch(
         error => {
 
@@ -1255,7 +1303,6 @@ run()
             console.error(
                 "======================================"
             );
-
 
             if (
                 error.response

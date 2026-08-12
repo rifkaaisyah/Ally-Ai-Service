@@ -18,8 +18,7 @@ Use a new ID whenever testing journey creation.
 =========================================================
 */
 
-const studentId =
-    "student-readiness-deep-84-api-test-002";
+const studentId= "student-timeline-status-test-002";
 
 
 /*
